@@ -22,7 +22,14 @@ TIMEZONE = ZoneInfo(os.environ.get("APP_TIMEZONE", "America/New_York"))
 CATEGORIES = ["Work", "School", "Job Search", "Personal"]
 STATUSES = ["Not started", "In progress", "Blocked", "Done"]
 PRIORITIES = ["High", "Medium", "Low"]
-CHARACTERS = re.findall(r"^  (\w+): \{", (ROOT / "frontend" / "characters.js").read_text(), re.M)
+def _roster(filename: str) -> list[str]:
+    return re.findall(r"^  (\w+): \{", (ROOT / "frontend" / filename).read_text(), re.M)
+
+
+# Helper characters per page theme; each task stores one helper per theme in `helpers`.
+ROSTERS = {"hp": _roster("characters.js"), "sw": _roster("characters_sw.js")}
+DEFAULT_HELPER = {"hp": "hermione", "sw": "yoda"}
+THEME_FLAVOR = {"hp": "Hogwarts", "sw": "Star Wars"}
 
 
 def local_today() -> date:
@@ -42,7 +49,7 @@ def load_api_key() -> str:
     raise RuntimeError("PORTKEY_API_KEY is not set")
 
 
-SYSTEM_PROMPT = """You manage the user's personal task tracker (a Harry Potter themed Gantt chart).
+SYSTEM_PROMPT = """You manage the user's personal task tracker (a Gantt chart with Harry Potter and Star Wars themes).
 Today is {today_long} ({today}).
 
 The user either reports progress ("finished X", "started Y", "didn't touch Z"), asks to add or change tasks,
@@ -54,11 +61,12 @@ Rules for updates:
 - Change status only when implied: started -> "In progress", finished -> "Done", stuck -> "Blocked".
 - Change deadline, start, priority, title, or category only if the user says so. Resolve weekday names to the
   next upcoming date in YYYY-MM-DD.
-- Only create a new task when the user clearly asks for or describes a new task. Give it a helper: the
-  Harry Potter character best suited to it, chosen from: {characters}, with a 1-2 sentence playful reason.
+- Only create a new task when the user clearly asks for or describes a new task. Give it two helpers, the
+  characters best suited to it, each with a 1-2 sentence playful reason: "hp" chosen from {hp_characters},
+  and "sw" chosen from {sw_characters}.
 - For planning questions, answer from the tasks: weigh deadlines, priority, overdue items, and tasks with
   no recent notes. Make no changes.
-- Keep replies short and friendly; a light Hogwarts flavor is welcome.
+- Keep replies short and friendly; a light {flavor} flavor is welcome.
 
 Allowed values: category {categories}; status {statuses}; priority {priorities}.
 
@@ -72,17 +80,20 @@ Respond with ONLY a JSON object of this shape:
                "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "title": "...", "category": "..."}}],
   "new_tasks": [{{"title": "...", "category": "...", "status": "...", "priority": "...",
                  "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "note": "optional",
-                 "helper": {{"character": "key", "reason": "..."}}}}]
+                 "helpers": {{"hp": {{"character": "key", "reason": "..."}},
+                             "sw": {{"character": "key", "reason": "..."}}}}}}]
 }}
 Omit fields in an update that don't change. Use empty lists when there is nothing to change."""
 
 
-def call_model(messages: list[dict], data: dict) -> dict:
+def call_model(messages: list[dict], data: dict, theme: str = "hp") -> dict:
     today = local_today()
     system = SYSTEM_PROMPT.format(
         today=today.isoformat(),
         today_long=today.strftime("%A, %B %-d, %Y"),
-        characters=", ".join(CHARACTERS),
+        hp_characters=", ".join(ROSTERS["hp"]),
+        sw_characters=", ".join(ROSTERS["sw"]),
+        flavor=THEME_FLAVOR.get(theme, THEME_FLAVOR["hp"]),
         categories=CATEGORIES,
         statuses=STATUSES,
         priorities=PRIORITIES,
@@ -147,6 +158,19 @@ def slugify(title: str, taken: set) -> str:
     return slug
 
 
+def clean_helpers(raw) -> dict:
+    """One valid helper per theme, falling back to a default character."""
+    raw = raw if isinstance(raw, dict) else {}
+    out = {}
+    for theme, roster in ROSTERS.items():
+        h = raw.get(theme) if isinstance(raw.get(theme), dict) else {}
+        out[theme] = {
+            "character": h.get("character") if h.get("character") in roster else DEFAULT_HELPER[theme],
+            "reason": str(h.get("reason") or "Always ready to help."),
+        }
+    return out
+
+
 def apply_changes(data: dict, plan: dict) -> list[str]:
     today = local_today().isoformat()
     by_id = {t["id"]: t for t in data["tasks"]}
@@ -168,7 +192,6 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
         fields = clean_fields(new)
         if not fields.get("title") or not fields.get("deadline"):
             continue
-        helper = new.get("helper") or {}
         task = {
             "id": slugify(fields["title"], set(by_id)),
             "title": fields["title"],
@@ -177,10 +200,7 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
             "priority": fields.get("priority", "Medium"),
             "start": fields.get("start", today),
             "deadline": fields["deadline"],
-            "helper": {
-                "character": helper.get("character") if helper.get("character") in CHARACTERS else "hermione",
-                "reason": str(helper.get("reason") or "Always ready to help."),
-            },
+            "helpers": clean_helpers(new.get("helpers")),
             "description": "",
             "notes": [{"date": today, "text": new["note"].strip()}] if isinstance(new.get("note"), str) and new["note"].strip() else [],
         }

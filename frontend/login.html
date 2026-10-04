@@ -3,27 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Hogwarts Task Map · Log in</title>
+  <title>The Hogwarts Task Map</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "hp";</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&family=Exo+2:wght@400;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header class="topbar">
     <div>
-      <span class="brand">⚡ The Hogwarts Task Map</span>
-      <div class="tagline">Mischief managed, one task at a time</div>
+      <span class="brand" data-t="brand">⚡ The Hogwarts Task Map</span>
+      <div class="tagline" data-t="tagline">Mischief managed, one task at a time</div>
     </div>
   </header>
   <main class="login-wrap">
     <form class="login-card" method="post" action="/login">
-      <h1>Password, please</h1>
-      <p>The Fat Lady won't let just anyone in.</p>
+      <h1 data-t="loginTitle">Password, please</h1>
+      <p data-t="loginSub">The Fat Lady won't let just anyone in.</p>
       <div class="login-error" id="error" hidden>That's not the password. Try again.</div>
       <input type="password" name="password" placeholder="Password" autocomplete="current-password" autofocus required>
-      <button type="submit">Enter</button>
+      <button type="submit" data-t="loginButton">Enter</button>
     </form>
   </main>
+  <script src="/themes.js"></script>
   <script>
     if (new URLSearchParams(location.search).has("error")) document.getElementById("error").hidden = false;
   </script>

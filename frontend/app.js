@@ -64,10 +64,20 @@ function badge(kind, value) {
   return `<span class="badge ${kind}-${slug(value)}">${esc(value)}</span>`;
 }
 
+// Each task has a helper per theme: helpers.hp / helpers.sw. (Older tasks kept the
+// Harry Potter one in `helper`.)
+const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS };
+
+function taskHelper(t) {
+  const h = t.helpers?.[currentTheme] ?? (currentTheme === "hp" ? t.helper : null);
+  const ch = h && ROSTERS[currentTheme][h.character];
+  return ch ? { ch, reason: h.reason } : null;
+}
+
 function helperHtml(t, size) {
-  const ch = t.helper && CHARACTERS[t.helper.character];
-  if (!ch) return "";
-  return `<span class="helper helper-${size}" data-tip-name="${esc(ch.name)}" data-tip="${esc(t.helper.reason)}">${labubuSVG(ch)}</span>`;
+  const h = taskHelper(t);
+  if (!h) return "";
+  return `<span class="helper helper-${size}" data-tip-name="${esc(h.ch.name)}" data-tip="${esc(h.reason)}">${labubuSVG(h.ch)}</span>`;
 }
 
 function renderSummary(list) {
@@ -80,7 +90,7 @@ function renderSummary(list) {
     ["Active", active.length, ""],
     ["Due in 7 days", week.length, ""],
     ["Overdue", active.filter(isOverdue).length, "alert"],
-    ["Mischief managed", list.length - active.length, "good"],
+    [T("done"), list.length - active.length, "good"],
   ];
   return `<section class="summary">${stats
     .map(([label, n, cls]) => `<div class="stat ${cls}"><div class="stat-n">${n}</div><div class="stat-l">${label}</div></div>`)
@@ -198,7 +208,7 @@ function renderTask(id) {
   const t = tasks.find((x) => x.id === id);
   const app = document.getElementById("app");
   if (!t) {
-    app.innerHTML = `<a class="back" href="#/">&larr; Back to the map</a><p class="empty">Task not found.</p>`;
+    app.innerHTML = `<a class="back" href="#/">&larr; ${T("back")}</a><p class="empty">Task not found.</p>`;
     return;
   }
 
@@ -216,13 +226,13 @@ function renderTask(id) {
     ["Timing", `<span class="${isOverdue(t) ? "text-alert" : ""}">${dueText(t)}</span>`],
   ];
 
-  const ch = t.helper && CHARACTERS[t.helper.character];
-  const helperSection = ch
-    ? `<section><h2>Assigned helper</h2><div class="helper-card">${helperHtml(t, "lg")}
-        <div><div class="helper-name">${esc(ch.name)}</div><p>${esc(t.helper.reason)}</p></div></div></section>`
+  const h = taskHelper(t);
+  const helperSection = h
+    ? `<section><h2>${T("helperHeading")}</h2><div class="helper-card">${helperHtml(t, "lg")}
+        <div><div class="helper-name">${esc(h.ch.name)}</div><p>${esc(h.reason)}</p></div></div></section>`
     : "";
 
-  app.innerHTML = `<a class="back" href="#/">&larr; Back to the map</a>
+  app.innerHTML = `<a class="back" href="#/">&larr; ${T("back")}</a>
     <article class="task">
       <h1>${titleHtml(t)}</h1>
       <dl class="fields">${fields.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
@@ -276,4 +286,5 @@ async function loadTasks() {
 }
 
 window.addEventListener("hashchange", () => route());
+document.addEventListener("themechange", () => route(true));
 loadTasks();

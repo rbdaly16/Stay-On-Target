@@ -1,13 +1,13 @@
-// Owl Post: floating chat panel. Sends the conversation to server.py, which updates
-// data.js; the page then re-renders with the returned data.
+// Owl Post / Holocomm (named by theme): floating chat panel. Sends the conversation to
+// the backend, which saves any task changes; the page then re-renders with the returned data.
 
 const chatHistory = JSON.parse(sessionStorage.getItem("owlPost") || "[]");
 
 document.body.insertAdjacentHTML(
   "beforeend",
-  `<button class="chat-fab" id="chat-open" title="Send an update">🦉 Owl Post</button>
+  `<button class="chat-fab" id="chat-open" title="Send an update" data-t="chatName">${T("chatName")}</button>
   <section class="chat-panel" id="chat-panel" hidden>
-    <header><span>🦉 Owl Post</span><button id="chat-close" aria-label="Close">&times;</button></header>
+    <header><span data-t="chatName">${T("chatName")}</span><button id="chat-close" aria-label="Close">&times;</button></header>
     <div class="chat-log" id="chat-log"></div>
     <form class="chat-form" id="chat-form">
       <textarea id="chat-input" rows="2" placeholder="e.g. Finished stats, started the AI homework"></textarea>
@@ -29,7 +29,7 @@ function addBubble(role, text, changes = []) {
 }
 
 if (!chatHistory.length) {
-  addBubble("assistant", "Tell me what you worked on today, or ask what's coming up. I'll update the map for you.");
+  addBubble("assistant", T("chatIntro"));
 }
 chatHistory.forEach((m) => addBubble(m.role, m.content, m.changes));
 
@@ -43,14 +43,14 @@ async function send() {
   input.value = "";
   chatHistory.push({ role: "user", content: text });
   addBubble("user", text);
-  const pending = addBubble("assistant pending", "The owl is flying…");
+  const pending = addBubble("assistant pending", T("chatPending"));
   sendBtn.disabled = true;
 
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: chatHistory.map(({ role, content }) => ({ role, content })) }),
+      body: JSON.stringify({ theme: currentTheme, messages: chatHistory.map(({ role, content }) => ({ role, content })) }),
     });
     const out = await res.json();
     pending.remove();
@@ -62,7 +62,7 @@ async function send() {
   } catch (err) {
     pending.remove();
     chatHistory.pop(); // let the user resend the same message
-    addBubble("assistant error", `The owl couldn't get through (${err.message}). Try again in a moment.`);
+    addBubble("assistant error", `${T("chatError")} (${err.message}). Try again in a moment.`);
   } finally {
     saveHistory();
     sendBtn.disabled = false;

@@ -4,23 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Hogwarts Task Map</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "hp";</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&family=Exo+2:wght@400;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
     <div>
-      <a href="#/" class="brand">⚡ The Hogwarts Task Map</a>
-      <div class="tagline">Mischief managed, one task at a time</div>
+      <a href="#/" class="brand" data-t="brand">⚡ The Hogwarts Task Map</a>
+      <div class="tagline" data-t="tagline">Mischief managed, one task at a time</div>
     </div>
     <div class="topbar-right">
       <span id="last-updated"></span>
+      <label class="theme-picker">Theme
+        <select id="theme-select">
+          <option value="hp">Harry Potter</option>
+          <option value="sw">Star Wars</option>
+        </select>
+      </label>
       <form method="post" action="/logout"><button class="logout" type="submit">Log out</button></form>
     </div>
   </header>
   <main id="app"></main>
   <script src="characters.js"></script>
+  <script src="characters_sw.js"></script>
+  <script src="themes.js"></script>
   <script src="app.js"></script>
   <script src="chat.js"></script>
 </body>

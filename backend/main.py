@@ -26,7 +26,7 @@ APP_PASSWORD = os.environ.get("APP_PASSWORD", "")
 SESSION_SECRET = os.environ.get("SESSION_SECRET") or secrets.token_hex(32)
 SESSION_DAYS = 30
 COOKIE = "owl_session"
-PUBLIC_PATHS = {"/login", "/healthz", "/styles.css"}
+PUBLIC_PATHS = {"/login", "/healthz", "/styles.css", "/themes.js"}
 
 if ON_RENDER and not APP_PASSWORD:
     raise RuntimeError("APP_PASSWORD must be set on Render so the site isn't public.")
@@ -107,7 +107,7 @@ def get_data():
 def chat(payload: dict):
     messages = [m for m in payload.get("messages", []) if m.get("role") in ("user", "assistant")]
     try:
-        plan = owl.call_model(messages, storage.load())
+        plan = owl.call_model(messages, storage.load(), payload.get("theme", "hp"))
         # Re-read under lock when applying, so nothing saved during the model call is lost.
         with storage.mutate() as data:
             changes = owl.apply_changes(data, plan)

@@ -1,6 +1,7 @@
 // Harry Potter Labubus drawn as inline SVG. Each task's `helper.character` in data.js
 // references a key here. Every character shares the Labubu base (bunny ears, round
-// furry head, toothy grin); `back`, `body`, `front`, and `eyes` layer on their look.
+// furry head, toothy grin); `back`, `body`, `front`, `eyes`, `face`, and `earInner`
+// customize the look. Star Wars characters live in characters_sw.js.
 
 const FACE = "#f7e1cc";
 const eye = (x) => `<ellipse cx="${x}" cy="66" rx="4.3" ry="5.3" fill="#24150f"/><circle cx="${x + 1.5}" cy="64" r="1.5" fill="#fff"/>`;
@@ -127,16 +128,17 @@ const CHARACTERS = {
 
 function labubuSVG(c) {
   const fur = c.fur;
+  const ear = c.earInner || "#f2b8c0";
   return `<svg viewBox="0 0 100 130" class="labubu" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     ${c.back || ""}
     <ellipse cx="50" cy="114" rx="23" ry="15" fill="${c.robe}"/>
     ${c.body || ""}
     <ellipse cx="35" cy="26" rx="8.5" ry="21" fill="${fur}" transform="rotate(-14 35 26)"/>
-    <ellipse cx="35" cy="28" rx="4" ry="13" fill="#f2b8c0" transform="rotate(-14 35 28)"/>
+    <ellipse cx="35" cy="28" rx="4" ry="13" fill="${ear}" transform="rotate(-14 35 28)"/>
     <ellipse cx="65" cy="26" rx="8.5" ry="21" fill="${fur}" transform="rotate(14 65 26)"/>
-    <ellipse cx="65" cy="28" rx="4" ry="13" fill="#f2b8c0" transform="rotate(14 65 28)"/>
+    <ellipse cx="65" cy="28" rx="4" ry="13" fill="${ear}" transform="rotate(14 65 28)"/>
     <circle cx="50" cy="64" r="30" fill="${fur}"/>
-    <ellipse cx="50" cy="70" rx="21" ry="17" fill="${FACE}"/>
+    <ellipse cx="50" cy="70" rx="21" ry="17" fill="${c.face || FACE}"/>
     <circle cx="35" cy="76" r="3.2" fill="#f4a7a7" opacity=".7"/>
     <circle cx="65" cy="76" r="3.2" fill="#f4a7a7" opacity=".7"/>
     ${c.eyes ?? EYES}

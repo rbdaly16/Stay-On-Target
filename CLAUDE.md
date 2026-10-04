@@ -1,6 +1,6 @@
 # Gantt Task Tracker
 
-- `frontend/`: `index.html`, `app.js`, `styles.css`, `characters.js` (Labubus), `chat.js` (Owl Post), `login.html`. Plain JS, no build step.
+- `frontend/`: `index.html`, `app.js`, `styles.css`, `themes.js` (Harry Potter / Star Wars wording; picker in header, saved in localStorage), `characters.js` + `characters_sw.js` (Labubus), `chat.js` (Owl Post / Holocomm), `login.html`. Plain JS, no build step. Star Wars styling is `:root[data-theme="sw"]` overrides at the end of `styles.css`.
 - `backend/`: FastAPI. `main.py` (routes + password login), `storage.py` (Postgres when `DATABASE_URL` is set, else local `data.js`), `owl.py` (gpt5.6-luna via Portkey Responses API; validates model-proposed changes).
 - Local run: `.venv/bin/uvicorn backend.main:app --port 8765` from `gannt_chart/` (preview config "gantt"). No `APP_PASSWORD` locally = no login.
 - Deployed on Render (free web service, `gannt_chart/render.yaml`) with data in a free Neon Postgres database.
@@ -21,7 +21,7 @@ When the user reports what they did (or didn't) work on:
 - Afterward, summarize what changed (and push to live if using manage.py).
 
 ## Helpers
-Every task gets a `helper: { character, reason }`: the Harry Potter character best suited to it, shown as a Labubu with `reason` (1–2 sentences) as hover text. `character` must be a key in `frontend/characters.js`. If a better fit isn't there yet, add a Labubu for it (same SVG layering as the others). Never use image generation.
+Every task gets `helpers: { hp: { character, reason }, sw: { character, reason } }`: the Harry Potter and Star Wars characters best suited to it, shown as Labubus with `reason` (1–2 sentences) as hover text. `hp` keys come from `frontend/characters.js`, `sw` keys from `frontend/characters_sw.js`. If a better fit isn't there yet, add a Labubu for it (same SVG layering as the others). Never use image generation.
 
 ## Planning questions
 For "what's coming up this week/month" or "how should I prioritize", read `data.js` and answer from it. Rank by deadline, priority, and overdue status, and note anything that's blocked or hasn't been touched lately.
