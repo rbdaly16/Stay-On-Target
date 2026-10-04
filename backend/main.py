@@ -13,6 +13,7 @@ import os
 import secrets
 import time
 import urllib.error
+from urllib.parse import quote
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -63,7 +64,13 @@ async def require_login(request: Request, call_next):
         return await call_next(request)
     if request.url.path.startswith("/api/"):
         return JSONResponse({"error": "Please log in again."}, status_code=401)
-    return RedirectResponse("/login", status_code=303)
+    target = request.url.path + (f"?{request.url.query}" if request.url.query else "")
+    return RedirectResponse(f"/login?next={quote(target, safe='')}", status_code=303)
+
+
+def _safe_next(path: str) -> str:
+    """Only follow same-site paths after login, never another domain."""
+    return path if path.startswith("/") and not path.startswith("//") and "\\" not in path else "/"
 
 
 @app.get("/login")
@@ -74,11 +81,12 @@ def login_page():
 
 
 @app.post("/login")
-def login(password: str = Form(...)):
+def login(password: str = Form(...), next: str = Form("/")):
+    next = _safe_next(next)
     if not APP_PASSWORD or not hmac.compare_digest(password.encode(), APP_PASSWORD.encode()):
         time.sleep(1)  # slow down guessing
-        return RedirectResponse("/login?error=1", status_code=303)
-    resp = RedirectResponse("/", status_code=303)
+        return RedirectResponse(f"/login?error=1&next={quote(next, safe='')}", status_code=303)
+    resp = RedirectResponse(next, status_code=303)
     resp.set_cookie(COOKIE, _sign(int(time.time()) + SESSION_DAYS * 86400), max_age=SESSION_DAYS * 86400,
                     httponly=True, secure=ON_RENDER, samesite="lax")
     return resp

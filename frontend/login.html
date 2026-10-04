@@ -21,13 +21,16 @@
       <h1 data-t="loginTitle">Password, please</h1>
       <p data-t="loginSub">The Fat Lady won't let just anyone in.</p>
       <div class="login-error" id="error" hidden>That's not the password. Try again.</div>
+      <input type="hidden" name="next" id="next">
       <input type="password" name="password" placeholder="Password" autocomplete="current-password" autofocus required>
       <button type="submit" data-t="loginButton">Enter</button>
     </form>
   </main>
   <script src="/themes.js"></script>
   <script>
-    if (new URLSearchParams(location.search).has("error")) document.getElementById("error").hidden = false;
+    const params = new URLSearchParams(location.search);
+    if (params.has("error")) document.getElementById("error").hidden = false;
+    document.getElementById("next").value = params.get("next") || "/";
   </script>
 </body>
 </html>
