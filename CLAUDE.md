@@ -4,7 +4,7 @@
 - `backend/`: FastAPI. `main.py` (routes + password login), `storage.py` (Postgres when `DATABASE_URL` is set, else local `data.js`), `owl.py` (gpt5.6-luna via Portkey Responses API; validates model-proposed changes).
 - Local run: `.venv/bin/uvicorn backend.main:app --port 8765` from `gannt_chart/` (preview config "gantt"). No `APP_PASSWORD` locally = no login.
 - Deployed on Render (free web service, `gannt_chart/render.yaml`) with data in a free Neon Postgres database.
-- GitHub: this folder alone is published to its own private repo, rbdaly16/Stay-On-Target (remote `hogwarts`); Render deploys from it with `git subtree push --prefix=gannt_chart hogwarts main`, run from the my-app root. Never push the my-app repo itself. `data.js` and `.env` are gitignored and must never be committed.
+- GitHub: this folder alone is published to its own private repo, rbdaly16/Stay-On-Target (remote `hogwarts`), which Render deploys from. Publish changes with `git subtree push --prefix=gannt_chart hogwarts main`, run from the my-app root. Never push the my-app repo itself. `data.js` and `.env` are gitignored and must never be committed.
 
 ## Where to make updates
 - Once the live site exists, **the live Postgres database is the source of truth**. Before editing for the user, run `.venv/bin/python manage.py pull` (live → `data.js`), edit `data.js`, then `manage.py push` (asks for confirmation; overwrites live). `manage.py` reads the Neon connection string from `NEON_STAY_ON_TARGET_DATABASE_URL` in the repo-root `.env` (Neon project "Stay on Target"). If that isn't set up, ask the user to make the update through Owl Post instead.
