@@ -1,0 +1,5 @@
+# Personal task data and secrets never go to GitHub
+data.js
+.env
+.venv/
+__pycache__/

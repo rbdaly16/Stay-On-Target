@@ -1,0 +1,25 @@
+# Render Blueprint for the Hogwarts Task Map. Free Render web service;
+# tasks live in a free Neon Postgres database (Render's free Postgres expires after 30 days).
+# Secrets marked sync: false are entered in the Render dashboard when the Blueprint is created.
+services:
+  - type: web
+    name: hogwarts-task-map
+    runtime: python
+    plan: free
+    region: ohio  # same region as the Neon database (AWS us-east-2)
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_TIMEZONE
+        value: America/New_York
+      - key: DATABASE_URL  # Neon connection string
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: APP_PASSWORD
+        sync: false
+      - key: PORTKEY_API_KEY
+        sync: false
