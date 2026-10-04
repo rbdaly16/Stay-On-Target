@@ -1,6 +1,6 @@
 # Gantt Task Tracker
 
-- `frontend/`: `index.html`, `app.js`, `styles.css`, `themes.js` (Harry Potter / Star Wars wording; picker in header, saved in localStorage), `characters.js` + `characters_sw.js` (Labubus), `chat.js` (Owl Post / Holocomm), `login.html`. Plain JS, no build step. Star Wars styling is `:root[data-theme="sw"]` overrides at the end of `styles.css`.
+- `frontend/`: `index.html`, `app.js`, `styles.css`, `themes.js` (Harry Potter / Star Wars wording; picker in header, saved in localStorage), `characters.js` + `characters_sw.js` (Labubus), `chat.js` (Owl Post / Holocomm), `login.html`. Plain JS, no build step. Star Wars styling is `:root[data-theme="sw"]` overrides at the end of `styles.css`. `celebrate.js` plays a themed animation (X-wing vs. Death Star / Hedwig) when a task newly shows as Done in a browser; preview with `?celebrate` in the URL.
 - `backend/`: FastAPI. `main.py` (routes + password login), `storage.py` (Postgres when `DATABASE_URL` is set, else local `data.js`), `owl.py` (gpt5.6-luna via Portkey Responses API; validates model-proposed changes).
 - Local run: `.venv/bin/uvicorn backend.main:app --port 8765` from `gannt_chart/` (preview config "gantt"). No `APP_PASSWORD` locally = no login.
 - Deployed on Render (free web service, `gannt_chart/render.yaml`) with data in a free Neon Postgres database.

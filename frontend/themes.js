@@ -17,6 +17,7 @@ const THEMES = {
     loginTitle: "Password, please",
     loginSub: "The Fat Lady won't let just anyone in.",
     loginButton: "Enter",
+    celebrateTitle: "Mischief managed!",
   },
   sw: {
     name: "Star Wars",
@@ -33,6 +34,7 @@ const THEMES = {
     loginTitle: "Clearance code, please",
     loginSub: "Only authorized pilots beyond this point.",
     loginButton: "Engage",
+    celebrateTitle: "Mission complete!",
   },
 };
 

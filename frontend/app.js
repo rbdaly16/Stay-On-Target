@@ -273,6 +273,7 @@ function route(keepScroll = false) {
 function setTaskData(data, keepScroll = true) {
   ({ tasks, lastUpdated } = data);
   route(keepScroll);
+  celebrateNewlyDone(tasks);
 }
 
 async function loadTasks() {
