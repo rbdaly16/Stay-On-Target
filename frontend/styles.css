@@ -685,3 +685,29 @@ body.signed-out #last-updated { display: none; }
   80% { opacity: 0.9; transform: scaleX(1.1); }
   100% { opacity: 0; transform: scaleX(1.2); }
 }
+
+/* Welcome screen for an empty tracker (app.js renderWelcome) */
+.welcome { max-width: 760px; margin: 2vh auto 0; background: var(--parchment-light); border: 1px solid var(--line); border-top: 5px solid var(--green); border-radius: 8px; padding: 26px 32px; }
+.welcome h1 { margin: 0 0 8px; color: var(--green-dark); }
+.welcome h2 { font-size: 17px; color: var(--red-dark); margin: 24px 0 10px; }
+.welcome p { margin: 0 0 10px; line-height: 1.5; }
+.welcome-steps { padding-left: 22px; line-height: 1.55; }
+.welcome-steps li { margin-bottom: 8px; }
+.welcome-examples { display: grid; gap: 10px; }
+.example {
+  text-align: left;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.example:hover { border-color: var(--green); border-left-color: var(--green); }
+.example span { display: block; font-family: var(--font-display); font-size: 13px; color: var(--green); margin-bottom: 2px; }
+.welcome-note { font-size: 14px; color: var(--ink-soft); font-style: italic; }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .welcome h1 { color: var(--green-mid); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .welcome h2 { color: var(--red); }

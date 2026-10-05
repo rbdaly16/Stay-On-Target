@@ -13,17 +13,21 @@ origins), CHAT_DAILY_LIMIT (Owl Post messages per user per day, default 60),
 APP_TIMEZONE (default America/New_York).
 """
 
+import os
+import time
 import urllib.error
 
 from . import config  # noqa: F401  (loads .env before the modules below read settings)
 from fastapi import Depends, FastAPI
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import auth, owl, storage
 
 FRONTEND = storage.ROOT / "frontend"
 CHAT_DAILY_LIMIT = int(config.env("CHAT_DAILY_LIMIT", default="60"))
+# Stamped onto script/stylesheet URLs so every deploy loads fresh, matching files.
+ASSET_VERSION = os.environ.get("RENDER_GIT_COMMIT", "")[:8] or str(int(time.time()))
 
 if not auth.PUBLISHABLE_KEY:
     raise RuntimeError("CLERK_PUBLISHABLE_KEY must be set.")
@@ -31,6 +35,15 @@ if config.ON_RENDER and not storage.DATABASE_URL:
     raise RuntimeError("DATABASE_URL must be set on Render; its disk is wiped on every restart.")
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@app.middleware("http")
+async def revalidate(request, call_next):
+    """Browsers must check for a newer version on every load (cheap 304 if unchanged), so
+    a deploy never leaves someone running stale scripts that don't match each other."""
+    response = await call_next(request)
+    response.headers.setdefault("Cache-Control", "no-cache")
+    return response
 
 
 @app.on_event("startup")
@@ -65,6 +78,13 @@ def chat(payload: dict, user_id: str = Depends(auth.current_user)):
         # Re-read under lock when applying, so nothing saved during the model call is lost.
         with storage.mutate(user_id) as data:
             changes = owl.apply_changes(data, plan)
+            # Safeguard: never silently drop a new task that's missing required fields.
+            for new in plan.get("new_tasks") or []:
+                if missing := owl.missing_new_task_fields(new):
+                    title = str(new.get("title") or "").strip() or "the new task"
+                    plan["reply"] = (plan.get("reply", "") + f"\n\nI haven't added \"{title}\" yet. I still need its "
+                                     f"{', '.join(missing)}. (Categories: {', '.join(owl.CATEGORIES)}; "
+                                     f"priorities: {', '.join(owl.PRIORITIES)}.)").strip()
             snapshot = dict(data)
         return {"reply": plan.get("reply", ""), "changes": changes, "data": snapshot}
     except urllib.error.HTTPError as e:
@@ -81,7 +101,10 @@ def old_login_page():
 
 @app.get("/")
 def index():
-    return FileResponse(FRONTEND / "index.html")
+    html = (FRONTEND / "index.html").read_text()
+    html = html.replace('.js"></script>', f'.js?v={ASSET_VERSION}"></script>')
+    html = html.replace('href="styles.css"', f'href="styles.css?v={ASSET_VERSION}"')
+    return HTMLResponse(html)
 
 
 app.mount("/", StaticFiles(directory=FRONTEND), name="frontend")

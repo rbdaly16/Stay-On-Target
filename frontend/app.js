@@ -188,7 +188,42 @@ function renderGantt() {
     <div class="legend">${legend}<span><i class="swatch overdue-swatch"></i>Overdue</span><span><i class="swatch today-swatch"></i>Today</span></div>`;
 }
 
+const EXAMPLES = [
+  ["Add a task", "Add a task: finish the accounting problem set. School, high priority, due Friday."],
+  ["Daily check-in", "I started the accounting problem set but didn't finish it."],
+  ["Plan ahead", "What's coming up this week, and what should I focus on first?"],
+];
+
+// Shown to a signed-in user whose tracker is empty.
+function renderWelcome() {
+  const chat = esc(T("chatName"));
+  return `<section class="welcome">
+    <h1>Welcome! Your tracker is empty.</h1>
+    <p>Everything here runs through the chat. Open <b>${chat}</b> (bottom right) and talk to it like an assistant.</p>
+    <ol class="welcome-steps">
+      <li><b>Add tasks.</b> Each new task needs a <b>title</b>, <b>category</b> (${GROUP_ORDER.category.join(", ")}),
+        <b>priority</b> (${GROUP_ORDER.priority.join(", ")}), and <b>deadline</b>. A start date is optional. If you leave
+        something out, the chat will ask for it before adding the task.</li>
+      <li><b>Check in.</b> Tell it what you worked on (or didn't). It updates statuses and adds dated notes to each task.</li>
+      <li><b>Plan.</b> Ask what's coming up or how to prioritize, and it answers from your tasks.</li>
+      <li><b>Explore.</b> Click any task for its details, notes, and helper. Switch the look with the Theme menu,
+        and finish a task to see a celebration.</li>
+    </ol>
+    <h2>Try an example</h2>
+    <div class="welcome-examples">${EXAMPLES.map(([label, text], i) =>
+      `<button class="example" data-example="${i}"><span>${esc(label)}</span>“${esc(text)}”</button>`).join("")}</div>
+    <p class="welcome-note">Clicking an example puts it in the chat box so you can edit it before sending.</p>
+  </section>`;
+}
+
 function renderOverview() {
+  if (!tasks.length) {
+    document.getElementById("app").innerHTML = renderWelcome();
+    document.querySelectorAll("[data-example]").forEach((b) =>
+      b.addEventListener("click", () => openChat(EXAMPLES[b.dataset.example][1]))
+    );
+    return;
+  }
   document.getElementById("app").innerHTML = renderSummary(tasks) + renderControls() + renderGantt();
 
   document.querySelectorAll("[data-group]").forEach((b) =>
@@ -293,5 +328,5 @@ async function loadTasks() {
 }
 
 window.addEventListener("hashchange", () => route());
-document.addEventListener("themechange", () => tasks.length && route(true));
+document.addEventListener("themechange", () => currentUserId && route(true));
 initAuth().then((signedIn) => signedIn && loadTasks());

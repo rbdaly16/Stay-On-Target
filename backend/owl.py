@@ -80,6 +80,9 @@ Rules for updates:
 - Change status only when implied: started -> "In progress", finished -> "Done", stuck -> "Blocked".
 - Change deadline, start, priority, title, or category only if the user says so. Resolve weekday names to the
   next upcoming date in YYYY-MM-DD.
+- A new task needs four things: title, category, priority, and deadline (start is optional and defaults to today).
+  If the user hasn't given all four, do NOT create it yet: reply asking for exactly the missing ones, listing the
+  allowed categories and priorities, and create it once a later message fills them in. Never guess them.
 - Only create a new task when the user clearly asks for or describes a new task. Give it one helper per theme,
   the character best suited to it, each with a 1-2 sentence reason (playful, except where noted):
 {helper_rules}
@@ -210,6 +213,15 @@ def clean_helpers(raw) -> dict:
     return out
 
 
+REQUIRED_NEW_TASK_FIELDS = ("title", "category", "priority", "deadline")
+
+
+def missing_new_task_fields(new: dict) -> list[str]:
+    """Required fields a proposed new task lacks (or has invalid values for)."""
+    fields = clean_fields(new)
+    return [f for f in REQUIRED_NEW_TASK_FIELDS if f not in fields]
+
+
 def apply_changes(data: dict, plan: dict) -> list[str]:
     today = local_today().isoformat()
     by_id = {t["id"]: t for t in data["tasks"]}
@@ -239,14 +251,14 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
 
     for new in plan.get("new_tasks") or []:
         fields = clean_fields(new)
-        if not fields.get("title") or not fields.get("deadline"):
-            continue
+        if missing_new_task_fields(new):
+            continue  # main.py tells the user what's still needed
         task = {
             "id": slugify(fields["title"], set(by_id)),
             "title": fields["title"],
-            "category": fields.get("category", "Personal"),
+            "category": fields["category"],
             "status": fields.get("status", "Not started"),
-            "priority": fields.get("priority", "Medium"),
+            "priority": fields["priority"],
             "start": fields.get("start", today),
             "deadline": fields["deadline"],
             "helpers": clean_helpers(new.get("helpers")),

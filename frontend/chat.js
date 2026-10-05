@@ -80,12 +80,17 @@ input.addEventListener("keydown", (e) => {
     send();
   }
 });
-document.getElementById("chat-open").addEventListener("click", () => {
+// Opens the panel; `prefill` (used by the welcome screen's examples) is placed in the
+// input for the user to edit or send.
+function openChat(prefill) {
   panel.hidden = false;
   document.getElementById("chat-open").hidden = true;
   log.scrollTop = log.scrollHeight;
+  if (prefill) input.value = prefill;
   input.focus();
-});
+}
+
+document.getElementById("chat-open").addEventListener("click", () => openChat());
 document.getElementById("chat-close").addEventListener("click", () => {
   panel.hidden = true;
   document.getElementById("chat-open").hidden = false;
