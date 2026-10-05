@@ -29,7 +29,7 @@ function addBubble(role, text, changes = []) {
 }
 
 if (!chatHistory.length) {
-  addBubble("assistant", T("chatIntro"));
+  addBubble("assistant", T("chatIntro")).dataset.t = "chatIntro"; // re-worded by applyTheme on theme change
 }
 chatHistory.forEach((m) => addBubble(m.role, m.content, m.changes));
 
