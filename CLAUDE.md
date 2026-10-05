@@ -31,7 +31,8 @@ Every task gets `helpers: { hp, sw, hindu, dragon }`, each `{ character, reason 
 For "what's coming up this week/month" or "how should I prioritize", read `data.js` and answer from it. Rank by deadline, priority, and overdue status, and note anything that's blocked or hasn't been touched lately.
 
 ## Allowed values
-- category: Work | School | Job Search | Personal
+- category: Work | School | Job Search | Personal | Uncategorized
+- deadline and start may be null: a quick-captured task (title only) is Uncategorized, Medium, undated, and shows a "No deadline yet" tag instead of a bar until it gets a deadline. Never invent a deadline.
 - status: Not started | In progress | Blocked | Done
 - priority: High | Medium | Low
 

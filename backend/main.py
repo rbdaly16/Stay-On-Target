@@ -78,13 +78,17 @@ def chat(payload: dict, user_id: str = Depends(auth.current_user)):
         # Re-read under lock when applying, so nothing saved during the model call is lost.
         with storage.mutate(user_id) as data:
             changes = owl.apply_changes(data, plan)
-            # Safeguard: never silently drop a new task that's missing required fields.
+            # Safeguards: never silently drop a new task, and always say when details were defaulted.
+            notes = []
             for new in plan.get("new_tasks") or []:
-                if missing := owl.missing_new_task_fields(new):
-                    title = str(new.get("title") or "").strip() or "the new task"
-                    plan["reply"] = (plan.get("reply", "") + f"\n\nI haven't added \"{title}\" yet. I still need its "
-                                     f"{', '.join(missing)}. (Categories: {', '.join(owl.CATEGORIES)}; "
-                                     f"priorities: {', '.join(owl.PRIORITIES)}.)").strip()
+                title = str(new.get("title") or "").strip()
+                if not title:
+                    notes.append("I couldn't add a task without a title. What should it be called?")
+                elif (defaulted := owl.defaulted_fields(new)) and "uncategorized" not in plan.get("reply", "").lower() \
+                        and "no deadline" not in plan.get("reply", "").lower():
+                    notes.append(f'"{title}" was added with no {", ".join(defaulted)} yet '
+                                 "(shown under Uncategorized, Medium priority, with no bar). Add details anytime.")
+            plan["reply"] = "\n\n".join([plan.get("reply", "").strip(), *notes]).strip()
             snapshot = dict(data)
         return {"reply": plan.get("reply", ""), "changes": changes, "data": snapshot}
     except urllib.error.HTTPError as e:

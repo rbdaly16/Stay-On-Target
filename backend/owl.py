@@ -19,7 +19,9 @@ MODEL = "gpt5.6-luna"
 PORTKEY_URL = "https://api.portkey.ai/v1/responses"
 TIMEZONE = ZoneInfo(os.environ.get("APP_TIMEZONE", "America/New_York"))
 
-CATEGORIES = ["Work", "School", "Job Search", "Personal"]
+CATEGORIES = ["Work", "School", "Job Search", "Personal", "Uncategorized"]
+# Quick capture: a new task only needs a title; these fill in what the user didn't say.
+NEW_TASK_DEFAULTS = {"category": "Uncategorized", "priority": "Medium"}
 STATUSES = ["Not started", "In progress", "Blocked", "Done"]
 PRIORITIES = ["High", "Medium", "Low"]
 def _roster(filename: str) -> list[str]:
@@ -80,9 +82,12 @@ Rules for updates:
 - Change status only when implied: started -> "In progress", finished -> "Done", stuck -> "Blocked".
 - Change deadline, start, priority, title, or category only if the user says so. Resolve weekday names to the
   next upcoming date in YYYY-MM-DD.
-- A new task needs four things: title, category, priority, and deadline (start is optional and defaults to today).
-  If the user hasn't given all four, do NOT create it yet: reply asking for exactly the missing ones, listing the
-  allowed categories and priorities, and create it once a later message fills them in. Never guess them.
+- A new task only needs a title. Use the category, priority, deadline, and start the user gives. If they leave
+  any out, still create the task: category "Uncategorized", priority "Medium", and NO deadline or start (omit
+  those fields). Never invent a deadline. In the reply, say which details were left at those defaults and that
+  they can add them anytime (e.g. "Call the dentist is Personal, due Friday").
+- Tasks with no deadline have no bar on the chart. When the user later gives a deadline, set it (and start, if
+  given) in an update. In planning answers, mention undated tasks separately.
 - Only create a new task when the user clearly asks for or describes a new task. Give it one helper per theme,
   the character best suited to it, each with a 1-2 sentence reason (playful, except where noted):
 {helper_rules}
@@ -213,13 +218,10 @@ def clean_helpers(raw) -> dict:
     return out
 
 
-REQUIRED_NEW_TASK_FIELDS = ("title", "category", "priority", "deadline")
-
-
-def missing_new_task_fields(new: dict) -> list[str]:
-    """Required fields a proposed new task lacks (or has invalid values for)."""
+def defaulted_fields(new: dict) -> list[str]:
+    """Details a proposed new task left out (or gave invalid values for), so it gets defaults."""
     fields = clean_fields(new)
-    return [f for f in REQUIRED_NEW_TASK_FIELDS if f not in fields]
+    return [f for f in ("category", "priority", "deadline") if f not in fields]
 
 
 def apply_changes(data: dict, plan: dict) -> list[str]:
@@ -235,6 +237,8 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
             if task.get(field) != value:
                 changes.append(f"{task['title']}: {field} → {value}")
                 task[field] = value
+        if task.get("deadline") and not task.get("start"):
+            task["start"] = min(today, task["deadline"])  # a quick-captured task just got its deadline
         if isinstance(upd.get("note"), str) and upd["note"].strip():
             task.setdefault("notes", []).append({"date": today, "text": upd["note"].strip()})
             changes.append(f"{task['title']}: added note")
@@ -251,16 +255,17 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
 
     for new in plan.get("new_tasks") or []:
         fields = clean_fields(new)
-        if missing_new_task_fields(new):
-            continue  # main.py tells the user what's still needed
+        if not fields.get("title"):
+            continue  # main.py tells the user a title is needed
         task = {
             "id": slugify(fields["title"], set(by_id)),
             "title": fields["title"],
-            "category": fields["category"],
+            "category": fields.get("category", NEW_TASK_DEFAULTS["category"]),
             "status": fields.get("status", "Not started"),
-            "priority": fields["priority"],
-            "start": fields.get("start", today),
-            "deadline": fields["deadline"],
+            "priority": fields.get("priority", NEW_TASK_DEFAULTS["priority"]),
+            # Undated tasks have no bar, so no start either until a deadline arrives.
+            "start": fields.get("start", today if fields.get("deadline") else None),
+            "deadline": fields.get("deadline"),
             "helpers": clean_helpers(new.get("helpers")),
             "description": "",
             "notes": [{"date": today, "text": new["note"].strip()}] if isinstance(new.get("note"), str) and new["note"].strip() else [],

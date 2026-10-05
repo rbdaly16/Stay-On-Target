@@ -2,7 +2,7 @@ const DAY_MS = 86400000;
 const DAY_W = 30;
 
 const GROUP_ORDER = {
-  category: ["Work", "School", "Job Search", "Personal"],
+  category: ["Work", "School", "Job Search", "Personal", "Uncategorized"],
   status: ["In progress", "Not started", "Blocked", "Done"],
   priority: ["High", "Medium", "Low"],
 };
@@ -41,12 +41,18 @@ function slug(s) {
   return s.toLowerCase().replace(/\s+/g, "-");
 }
 
+// Undated tasks sort after everything with a deadline.
+function deadlineValue(t) {
+  return t.deadline ? +parseDate(t.deadline) : Infinity;
+}
+
 function isOverdue(t) {
-  return t.status !== "Done" && parseDate(t.deadline) < today;
+  return t.status !== "Done" && !!t.deadline && parseDate(t.deadline) < today;
 }
 
 function dueText(t) {
   if (t.status === "Done") return "Done";
+  if (!t.deadline) return "No deadline yet";
   const n = daysBetween(today, parseDate(t.deadline));
   if (n < 0) return `Overdue by ${-n} day${n === -1 ? "" : "s"}`;
   if (n === 0) return "Due today";
@@ -89,6 +95,7 @@ function helperHtml(t, size) {
 function renderSummary(list) {
   const active = list.filter((t) => t.status !== "Done");
   const week = active.filter((t) => {
+    if (!t.deadline) return false;
     const n = daysBetween(today, parseDate(t.deadline));
     return n >= 0 && n <= 7;
   });
@@ -118,8 +125,10 @@ function renderGantt() {
   if (!visible.length) return `<p class="empty">No tasks to show.</p>`;
 
   // Timeline spans all tasks, padded, and always includes the week before and month after today.
-  const starts = visible.map((t) => parseDate(t.start || t.deadline));
-  const ends = visible.map((t) => parseDate(t.deadline));
+  // Quick-captured tasks without a deadline get a row but no bar, so they don't shape the timeline.
+  const dated = visible.filter((t) => t.deadline);
+  const starts = dated.map((t) => parseDate(t.start || t.deadline));
+  const ends = dated.map((t) => parseDate(t.deadline));
   const rangeStart = new Date(Math.min(...starts, today - 7 * DAY_MS) - 2 * DAY_MS);
   const rangeEnd = new Date(Math.max(...ends, +today + 30 * DAY_MS) + 3 * DAY_MS);
   const nDays = daysBetween(rangeStart, rangeEnd) + 1;
@@ -156,25 +165,31 @@ function renderGantt() {
   const body = groups
     .map((g) => {
       const rows = g.items
-        .sort((a, b) => parseDate(a.deadline) - parseDate(b.deadline))
+        .sort((a, b) => deadlineValue(a) - deadlineValue(b))
         .map((t) => {
-          const s = parseDate(t.start || t.deadline);
-          const left = daysBetween(rangeStart, s) * DAY_W;
-          const width = (daysBetween(s, parseDate(t.deadline)) + 1) * DAY_W;
+          const href = `#/task/${encodeURIComponent(t.id)}`;
+          let bar;
+          if (t.deadline) {
+            const s = parseDate(t.start || t.deadline);
+            const left = daysBetween(rangeStart, s) * DAY_W;
+            const width = (daysBetween(s, parseDate(t.deadline)) + 1) * DAY_W;
+            bar = `<a href="${href}" class="bar status-${slug(t.status)} ${isOverdue(t) ? "overdue" : ""}"
+                 style="left:${left}px;width:${width}px" title="${esc(t.title)} — ${esc(t.status)}, ${dueText(t)}">
+                ${esc(t.title)}
+              </a>`;
+          } else {
+            const left = daysBetween(rangeStart, today) * DAY_W + DAY_W;
+            bar = `<a href="${href}" class="no-deadline" style="left:${left}px" title="Tell the chat when it's due to add a bar">No deadline yet</a>`;
+          }
           return `<div class="g-row">
             <a class="g-label" href="#/task/${encodeURIComponent(t.id)}">
               ${helperHtml(t, "sm")}
               <span class="g-text">
                 <span class="g-title">${titleHtml(t)}</span>
-                <span class="g-meta">${badge("priority", t.priority)} ${fmtDate(t.deadline)}</span>
+                <span class="g-meta">${badge("priority", t.priority)} ${t.deadline ? fmtDate(t.deadline) : "No deadline"}</span>
               </span>
             </a>
-            <div class="g-track" style="width:${trackW}px">${weekendBg}${todayLine}
-              <a href="#/task/${encodeURIComponent(t.id)}" class="bar status-${slug(t.status)} ${isOverdue(t) ? "overdue" : ""}"
-                 style="left:${left}px;width:${width}px" title="${esc(t.title)} — ${esc(t.status)}, ${dueText(t)}">
-                ${esc(t.title)}
-              </a>
-            </div>
+            <div class="g-track" style="width:${trackW}px">${weekendBg}${todayLine}${bar}</div>
           </div>`;
         })
         .join("");
@@ -190,6 +205,7 @@ function renderGantt() {
 
 const EXAMPLES = [
   ["Add a task", "Add a task: finish the accounting problem set. School, high priority, due Friday."],
+  ["Jot something down", "Add a task: call the dentist"],
   ["Daily check-in", "I started the accounting problem set but didn't finish it."],
   ["Plan ahead", "What's coming up this week, and what should I focus on first?"],
 ];
@@ -201,9 +217,10 @@ function renderWelcome() {
     <h1>Welcome! Your tracker is empty.</h1>
     <p>Everything here runs through the chat. Open <b>${chat}</b> (bottom right) and talk to it like an assistant.</p>
     <ol class="welcome-steps">
-      <li><b>Add tasks.</b> Each new task needs a <b>title</b>, <b>category</b> (${GROUP_ORDER.category.join(", ")}),
-        <b>priority</b> (${GROUP_ORDER.priority.join(", ")}), and <b>deadline</b>. A start date is optional. If you leave
-        something out, the chat will ask for it before adding the task.</li>
+      <li><b>Add tasks.</b> Give each one a <b>title</b>, plus if you know them a <b>category</b>
+        (${GROUP_ORDER.category.slice(0, -1).join(", ")}), <b>priority</b> (${GROUP_ORDER.priority.join(", ")}), and
+        <b>deadline</b>. Just jotting something down? A title alone works: it lands in <b>Uncategorized</b> at Medium
+        priority with no bar until you tell the chat when it's due.</li>
       <li><b>Check in.</b> Tell it what you worked on (or didn't). It updates statuses and adds dated notes to each task.</li>
       <li><b>Plan.</b> Ask what's coming up or how to prioritize, and it answers from your tasks.</li>
       <li><b>Explore.</b> Click any task for its details, notes, and helper. Switch the look with the Theme menu,
@@ -263,7 +280,7 @@ function renderTask(id) {
     ["Status", badge("status", t.status)],
     ["Priority", badge("priority", t.priority)],
     ["Start", t.start ? fmtDate(t.start) : "—"],
-    ["Deadline", fmtDate(t.deadline)],
+    ["Deadline", t.deadline ? fmtDate(t.deadline) : "Not set yet"],
     ["Timing", `<span class="${isOverdue(t) ? "text-alert" : ""}">${dueText(t)}</span>`],
   ];
 

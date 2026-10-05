@@ -711,3 +711,19 @@ body.signed-out #last-updated { display: none; }
 .welcome-note { font-size: 14px; color: var(--ink-soft); font-style: italic; }
 :root:is([data-theme="sw"], [data-theme="dragon"]) .welcome h1 { color: var(--green-mid); }
 :root:is([data-theme="sw"], [data-theme="dragon"]) .welcome h2 { color: var(--red); }
+
+/* Quick-captured task with no deadline: a tag where the bar would be */
+.no-deadline {
+  position: absolute;
+  top: 19px;
+  padding: 3px 10px;
+  border: 1.5px dashed var(--stone);
+  border-radius: 999px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-soft);
+  background: var(--parchment-light);
+  white-space: nowrap;
+  z-index: 2;
+}
+.no-deadline:hover { border-color: var(--green); color: var(--green); }
