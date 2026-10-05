@@ -27,9 +27,28 @@ def _roster(filename: str) -> list[str]:
 
 
 # Helper characters per page theme; each task stores one helper per theme in `helpers`.
-ROSTERS = {"hp": _roster("characters.js"), "sw": _roster("characters_sw.js")}
-DEFAULT_HELPER = {"hp": "hermione", "sw": "yoda"}
-THEME_FLAVOR = {"hp": "Hogwarts", "sw": "Star Wars"}
+ROSTERS = {
+    "hp": _roster("characters.js"),
+    "sw": _roster("characters_sw.js"),
+    "hindu": _roster("characters_hindu.js"),
+    "dragon": _roster("characters_dragon.js"),
+}
+DEFAULT_HELPER = {"hp": "hermione", "sw": "yoda", "hindu": "ganesha", "dragon": "violet"}
+THEME_FLAVOR = {
+    "hp": "Hogwarts",
+    "sw": "Star Wars",
+    "hindu": "warm, respectful South Indian (never joke about the deities)",
+    "dragon": "Empyrean (Basgiath War College, dragon riders)",
+}
+HELPER_GUIDE = {
+    "hp": "Harry Potter characters",
+    "sw": "Star Wars characters",
+    "hindu": "Hindu deities (South Indian tradition). Pick the deity whose traditional role truly fits "
+    "(e.g. Ganesha for beginnings and obstacles, Saraswati for learning, Lakshmi or Kubera for money, "
+    "Dhanvantari for health, Hanuman for diligent service). The reason must be reverent and accurate "
+    "to Hindu tradition, with no jokes about the deity",
+    "dragon": "Empyrean series characters (riders and dragons)",
+}
 
 
 def local_today() -> date:
@@ -61,9 +80,9 @@ Rules for updates:
 - Change status only when implied: started -> "In progress", finished -> "Done", stuck -> "Blocked".
 - Change deadline, start, priority, title, or category only if the user says so. Resolve weekday names to the
   next upcoming date in YYYY-MM-DD.
-- Only create a new task when the user clearly asks for or describes a new task. Give it two helpers, the
-  characters best suited to it, each with a 1-2 sentence playful reason: "hp" chosen from {hp_characters},
-  and "sw" chosen from {sw_characters}.
+- Only create a new task when the user clearly asks for or describes a new task. Give it one helper per theme,
+  the character best suited to it, each with a 1-2 sentence reason (playful, except where noted):
+{helper_rules}
 - For planning questions, answer from the tasks: weigh deadlines, priority, overdue items, and tasks with
   no recent notes. Make no changes.
 - Keep replies short and friendly; a light {flavor} flavor is welcome.
@@ -80,8 +99,7 @@ Respond with ONLY a JSON object of this shape:
                "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "title": "...", "category": "..."}}],
   "new_tasks": [{{"title": "...", "category": "...", "status": "...", "priority": "...",
                  "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "note": "optional",
-                 "helpers": {{"hp": {{"character": "key", "reason": "..."}},
-                             "sw": {{"character": "key", "reason": "..."}}}}}}]
+                 "helpers": {{{helpers_example}}}}}]
 }}
 Omit fields in an update that don't change. Use empty lists when there is nothing to change."""
 
@@ -91,8 +109,10 @@ def call_model(messages: list[dict], data: dict, theme: str = "hp") -> dict:
     system = SYSTEM_PROMPT.format(
         today=today.isoformat(),
         today_long=today.strftime("%A, %B %-d, %Y"),
-        hp_characters=", ".join(ROSTERS["hp"]),
-        sw_characters=", ".join(ROSTERS["sw"]),
+        helper_rules="\n".join(
+            f'  - "{t}": {HELPER_GUIDE[t]}; choose from {", ".join(r)}' for t, r in ROSTERS.items()
+        ),
+        helpers_example=", ".join(f'"{t}": {{"character": "key", "reason": "..."}}' for t in ROSTERS),
         flavor=THEME_FLAVOR.get(theme, THEME_FLAVOR["hp"]),
         categories=CATEGORIES,
         statuses=STATUSES,

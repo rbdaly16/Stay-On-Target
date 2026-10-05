@@ -370,20 +370,21 @@ body.signed-out #last-updated { display: none; }
 }
 :root[data-theme="sw"] .brand { letter-spacing: 2px; }
 :root[data-theme="sw"] .tagline { font-style: normal; letter-spacing: 1px; text-transform: uppercase; font-size: 12px; }
-:root[data-theme="sw"] .stat,
-:root[data-theme="sw"] .gantt-wrap,
-:root[data-theme="sw"] .task { box-shadow: 0 0 0 1px rgba(255, 232, 31, 0.06), 0 4px 18px rgba(0, 0, 0, 0.5); }
-:root[data-theme="sw"] .group-by button { color: var(--red); border-color: var(--red); }
-:root[data-theme="sw"] .group-by button:hover { background: var(--red-light); }
-:root[data-theme="sw"] .group-by button.active { background: var(--red-dark); color: #fff; box-shadow: 0 0 10px rgba(255, 42, 42, 0.5); }
-:root[data-theme="sw"] .task h1,
-:root[data-theme="sw"] .helper-name { color: var(--green-mid); }
-:root[data-theme="sw"] .task h2 { color: var(--red); }
-:root[data-theme="sw"] .badge.priority-medium { color: #ff8a8a; }
-:root[data-theme="sw"] .badge.priority-low,
-:root[data-theme="sw"] .badge[class*="category-"] { color: #7dffa6; }
-:root[data-theme="sw"] .g-head .g-label,
-:root[data-theme="sw"] .g-head .g-track { color: var(--ink); }
+/* Readability fixes shared by the dark themes (Star Wars, Empyrean) */
+:root:is([data-theme="sw"], [data-theme="dragon"]) .stat,
+:root:is([data-theme="sw"], [data-theme="dragon"]) .gantt-wrap,
+:root:is([data-theme="sw"], [data-theme="dragon"]) .task { box-shadow: 0 0 0 1px rgba(255, 232, 31, 0.06), 0 4px 18px rgba(0, 0, 0, 0.5); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .group-by button { color: var(--red); border-color: var(--red); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .group-by button:hover { background: var(--red-light); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .group-by button.active { background: var(--red-dark); color: #fff; box-shadow: 0 0 10px rgba(255, 42, 42, 0.5); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .task h1,
+:root:is([data-theme="sw"], [data-theme="dragon"]) .helper-name { color: var(--green-mid); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .task h2 { color: var(--red); }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .badge.priority-medium { color: #ff8a8a; }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .badge.priority-low,
+:root:is([data-theme="sw"], [data-theme="dragon"]) .badge[class*="category-"] { color: #7dffa6; }
+:root:is([data-theme="sw"], [data-theme="dragon"]) .g-head .g-label,
+:root:is([data-theme="sw"], [data-theme="dragon"]) .g-head .g-track { color: var(--ink); }
 /* Bars and the today line glow like lightsabers */
 :root[data-theme="sw"] .bar.status-in-progress { box-shadow: 0 0 10px rgba(47, 209, 100, 0.7); }
 :root[data-theme="sw"] .bar.status-blocked { box-shadow: 0 0 10px rgba(255, 42, 42, 0.7); }
@@ -538,3 +539,149 @@ body.signed-out #last-updated { display: none; }
 @keyframes trail-fall { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(46px) scale(0.3); } }
 
 @keyframes fade-in-out { 0% { opacity: 0; } 8%, 85% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---- Hindu theme: South Indian temple style. Kanjeevaram silk maroon and temple green
+   with gold zari borders, kolam-dot background, gopuram border under the header. ---- */
+:root[data-theme="hindu"] {
+  --green-dark: #0f5132;
+  --green: #1b6b3e;
+  --green-mid: #2e8b57;
+  --green-light: #dcefd9;
+  --red-dark: #7a1414;
+  --red: #b3261e;
+  --red-light: #f8d7cf;
+  --gold: #d4a017;
+  --parchment: #fff4dc;
+  --parchment-light: #fffaf0;
+  --ink: #3b1d0e;
+  --ink-soft: #7a4b2a;
+  --line: #ecd09a;
+  --stone: #a1887f;
+  --font-display: "Rozha One", Georgia, serif;
+  --font-body: "Hind", "Segoe UI", sans-serif;
+  --header-text: #fff3c4;
+  --topbar-mid: #3d0f0f;
+  --hover: #fdebc8;
+  --weekend: rgba(212, 160, 23, 0.07);
+  --input-bg: #fff;
+}
+:root[data-theme="hindu"] body {
+  background-color: #fff4dc;
+  background-image: radial-gradient(circle, rgba(179, 38, 30, 0.16) 1.2px, transparent 1.6px);
+  background-size: 22px 22px;
+}
+:root[data-theme="hindu"] .topbar {
+  background: linear-gradient(90deg, var(--red-dark), var(--topbar-mid) 50%, var(--green-dark));
+  border-bottom: 0;
+  position: relative;
+  padding-bottom: 26px;
+}
+:root[data-theme="hindu"] .topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--gold) 50%) 0 0 / 16px 12px repeat-x,
+    linear-gradient(225deg, transparent 50%, var(--gold) 50%) 0 0 / 16px 12px repeat-x,
+    linear-gradient(var(--green-dark), var(--green-dark));
+}
+:root[data-theme="hindu"] .brand { font-weight: 400; letter-spacing: 0.5px; }
+:root[data-theme="hindu"] h1, :root[data-theme="hindu"] h2, :root[data-theme="hindu"] .stat-n { font-weight: 400; }
+:root[data-theme="hindu"] .gantt-wrap, :root[data-theme="hindu"] .task, :root[data-theme="hindu"] .stat { border-color: var(--gold); }
+:root[data-theme="hindu"] .g-group .g-label { color: var(--gold); font-weight: 400; }
+:root[data-theme="hindu"] .helper-lg .labubu { width: 110px; height: 143px; }
+
+/* ---- Empyrean theme: Basgiath stone, ember red and dragon green, gold for dragon eyes ---- */
+:root[data-theme="dragon"] {
+  --green-dark: #1f4d33;
+  --green: #2f7d4a;
+  --green-mid: #3fa564;
+  --green-light: #13261b;
+  --red-dark: #8f1d10;
+  --red: #e0452a;
+  --red-light: #3a1510;
+  --gold: #c9a227;
+  --parchment: #15171c;
+  --parchment-light: #1d2027;
+  --ink: #e8e2d6;
+  --ink-soft: #a39b8d;
+  --line: #333844;
+  --stone: #5f6470;
+  --font-display: "Almendra", Georgia, serif;
+  --font-body: "Crimson Pro", Georgia, serif;
+  --header-text: #e8d9a8;
+  --topbar-mid: #0d0e11;
+  --hover: #262a33;
+  --weekend: rgba(255, 255, 255, 0.025);
+  --input-bg: #15171c;
+}
+:root[data-theme="dragon"] body {
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(224, 69, 42, 0.22), transparent 60%),
+    linear-gradient(#101216, #15171c);
+  background-attachment: fixed;
+}
+:root[data-theme="dragon"] .brand { letter-spacing: 1.5px; }
+:root[data-theme="dragon"] .bar.status-in-progress { box-shadow: 0 0 8px rgba(63, 165, 100, 0.55); }
+:root[data-theme="dragon"] .bar.status-blocked { box-shadow: 0 0 8px rgba(224, 69, 42, 0.6); }
+:root[data-theme="dragon"] .today-line { box-shadow: 0 0 6px 1px rgba(224, 69, 42, 0.7); }
+
+/* Hindu celebration: kolam drawing, diyas lighting, marigold and jasmine petals */
+.celebration-hindu .celebration-scene { background: rgba(90, 16, 16, 0.32); animation: fade-in-out 5.2s ease forwards; }
+.temple-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(255, 193, 7, 0.35), rgba(255, 193, 7, 0) 60%); }
+.kolam { position: absolute; left: 50%; top: 40%; width: 40vmin; height: 40vmin; transform: translate(-50%, -50%); filter: drop-shadow(0 0 6px rgba(255, 248, 225, 0.6)); }
+.kolam svg { width: 100%; height: 100%; }
+.kolam-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: kolam-draw 2.2s 0.3s ease-in-out forwards; }
+@keyframes kolam-draw { to { stroke-dashoffset: 0; } }
+.diyas { position: absolute; left: 0; right: 0; bottom: 2vh; display: flex; justify-content: center; gap: 3vw; }
+.diya { width: 54px; opacity: 0; animation: diya-light 0.5s ease forwards; }
+.diya svg { width: 100%; filter: drop-shadow(0 0 10px rgba(255, 179, 0, 0.8)); }
+.diya-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 0.25s ease-in-out infinite alternate; }
+@keyframes diya-light { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+.petal { position: absolute; top: -6vh; border-radius: 50% 50% 50% 0; opacity: 0; animation: petal-fall linear forwards; }
+.petal.marigold { width: 13px; height: 13px; background: radial-gradient(circle at 40% 40%, #ffcc33, #ff8f00); }
+.petal.jasmine { width: 10px; height: 14px; background: #fffdf5; box-shadow: 0 0 4px rgba(255, 255, 255, 0.9); }
+@keyframes petal-fall {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0.9; transform: translate(var(--sway), 112vh) rotate(540deg); }
+}
+
+/* Empyrean celebration: lightning (Violet's signet) and Tairn flying past breathing fire */
+.celebration-dragon .celebration-scene { background: rgba(6, 7, 12, 0.55); animation: fade-in-out 5.2s ease forwards; }
+.storm-flash { position: absolute; inset: 0; background: #dfe9ff; opacity: 0; animation: storm-flash 3s 0.3s linear forwards; }
+@keyframes storm-flash {
+  0%, 3%, 9%, 38%, 41%, 72%, 76%, 100% { opacity: 0; }
+  1.5%, 6%, 39.5%, 74% { opacity: 0.35; }
+}
+.bolt { position: absolute; top: 0; width: 7vw; height: 62vh; opacity: 0; animation: bolt 0.55s linear forwards; filter: drop-shadow(0 0 12px #9fd3ff); }
+@keyframes bolt { 0%, 100% { opacity: 0; } 10%, 30%, 55% { opacity: 1; } 20%, 45% { opacity: 0.3; } }
+.tairn { position: absolute; left: 0; top: 26vh; width: 300px; animation: tairn-fly 4.2s 0.4s cubic-bezier(.4, .1, .5, 1) both; z-index: 3; }
+.tairn svg { width: 100%; filter: drop-shadow(0 0 14px rgba(224, 69, 42, 0.45)); }
+@keyframes tairn-fly {
+  0% { transform: translate(-40vw, 10vh) rotate(4deg); }
+  50% { transform: translate(40vw, -2vh) rotate(-3deg); }
+  100% { transform: translate(115vw, 6vh) rotate(2deg); }
+}
+.tairn-wing { transform-box: view-box; transform-origin: 110px 66px; animation: flap 0.45s ease-in-out infinite alternate; }
+.tairn-wing-back { animation-delay: 0.06s; }
+.tairn-fire {
+  position: absolute;
+  left: 91%;
+  top: 30%;
+  width: 46%;
+  height: 26%;
+  border-radius: 0 60% 60% 0 / 0 50% 50% 0;
+  background: radial-gradient(ellipse at 0% 50%, #fff3c4 0 12%, #ffb300 30%, #e0452a 60%, rgba(224, 69, 42, 0) 75%);
+  transform-origin: 0 50%;
+  opacity: 0;
+  animation: fire-breath 1.1s 1.9s ease-out forwards;
+}
+@keyframes fire-breath {
+  0% { opacity: 0; transform: scaleX(0.1); }
+  25% { opacity: 1; transform: scaleX(1); }
+  80% { opacity: 0.9; transform: scaleX(1.1); }
+  100% { opacity: 0; transform: scaleX(1.2); }
+}

@@ -6,7 +6,7 @@
   <title>The Hogwarts Task Map</title>
   <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "hp";</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&family=Exo+2:wght@400;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:wght@400;600;700&family=Exo+2:wght@400;600;700&family=Orbitron:wght@600;800&family=Rozha+One&family=Hind:wght@400;600;700&family=Almendra:wght@400;700&family=Crimson+Pro:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -21,6 +21,8 @@
         <select id="theme-select">
           <option value="hp">Harry Potter</option>
           <option value="sw">Star Wars</option>
+          <option value="hindu">Hindu (South Indian)</option>
+          <option value="dragon">Empyrean (Dragons)</option>
         </select>
       </label>
       <div id="user-button"></div>
@@ -29,6 +31,8 @@
   <main id="app"></main>
   <script src="characters.js"></script>
   <script src="characters_sw.js"></script>
+  <script src="characters_hindu.js"></script>
+  <script src="characters_dragon.js"></script>
   <script src="themes.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>

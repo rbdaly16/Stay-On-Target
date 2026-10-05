@@ -64,9 +64,15 @@ function badge(kind, value) {
   return `<span class="badge ${kind}-${slug(value)}">${esc(value)}</span>`;
 }
 
-// Each task has a helper per theme: helpers.hp / helpers.sw. (Older tasks kept the
-// Harry Potter one in `helper`.)
-const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS };
+// Each task has a helper per theme in `helpers` (hp, sw, hindu, dragon). Older tasks kept
+// the Harry Potter one in `helper`. Hindu deities render as Tanjore medallions; the rest
+// as Labubus.
+const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS, hindu: HINDU_CHARACTERS, dragon: DRAGON_CHARACTERS };
+const RENDERERS = { hindu: medallionSVG };
+
+function helperSVG(ch) {
+  return (RENDERERS[currentTheme] || labubuSVG)(ch);
+}
 
 function taskHelper(t) {
   const h = t.helpers?.[currentTheme] ?? (currentTheme === "hp" ? t.helper : null);
@@ -77,7 +83,7 @@ function taskHelper(t) {
 function helperHtml(t, size) {
   const h = taskHelper(t);
   if (!h) return "";
-  return `<span class="helper helper-${size}" data-tip-name="${esc(h.ch.name)}" data-tip="${esc(h.reason)}">${labubuSVG(h.ch)}</span>`;
+  return `<span class="helper helper-${size}" data-tip-name="${esc(h.ch.name)}" data-tip="${esc(h.reason)}">${helperSVG(h.ch)}</span>`;
 }
 
 function renderSummary(list) {

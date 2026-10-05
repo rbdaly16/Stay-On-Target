@@ -1,7 +1,9 @@
 // Completion celebrations. app.js calls celebrateNewlyDone() whenever task data loads; tasks
 // that are Done now but weren't the last time this browser looked trigger a themed scene.
 // Star Wars: an X-wing torpedoes the Death Star. Harry Potter: Hedwig delivers a letter
-// under floating candles and sparkles. All drawn in HTML/SVG; no images.
+// under floating candles and sparkles. Hindu: a kolam draws itself while diyas light and
+// marigold and jasmine petals fall. Empyrean: lightning strikes as Tairn flies past
+// breathing fire. All drawn in HTML/SVG; no images.
 
 const XWING_SVG = `<svg viewBox="0 0 170 84" xmlns="http://www.w3.org/2000/svg">
   <circle cx="16" cy="34" r="7" fill="#ff8a3d" opacity=".55"/><circle cx="16" cy="50" r="7" fill="#ff8a3d" opacity=".55"/>
@@ -41,7 +43,33 @@ const HEDWIG_SVG = `<svg viewBox="0 0 130 100" xmlns="http://www.w3.org/2000/svg
   <g class="hw-wing hw-wing-front"><path d="M66 46 Q58 0 22 2 Q44 22 80 50 Z" fill="#fdfdf9" stroke="#cfcfc6"/></g>
 </svg>`;
 
-const CELEBRATION_MS = { sw: 5200, hp: 5200, reduced: 2600 };
+// A simple pulli kolam: rice-flour lines looping around a 5x5 grid of dots.
+const KOLAM_SVG = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  ${[40, 70, 100, 130, 160].flatMap((x) => [40, 70, 100, 130, 160].map((y) => `<circle cx="${x}" cy="${y}" r="3.2" fill="#fff8e1"/>`)).join("")}
+  <path class="kolam-line" pathLength="1" d="M100 18 C146 18 182 54 182 100 C182 146 146 182 100 182 C54 182 18 146 18 100 C18 54 54 18 100 18 Z" stroke="#fff8e1"/>
+  <path class="kolam-line" pathLength="1" d="M100 52 L148 100 L100 148 L52 100 Z" stroke="#ffd54f"/>
+  ${[0, 90, 180, 270].map((a) => `<path class="kolam-line" pathLength="1" transform="rotate(${a} 100 100)" d="M100 100 C76 76 76 40 100 40 C124 40 124 76 100 100" stroke="#fff8e1"/>`).join("")}
+  ${[45, 135, 225, 315].map((a) => `<path class="kolam-line" pathLength="1" transform="rotate(${a} 100 100)" d="M100 100 C88 80 92 62 100 58 C108 62 112 80 100 100" stroke="#ef5350"/>`).join("")}
+</svg>`;
+
+const DIYA_SVG = `<svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 30 Q30 52 56 30 Q30 38 4 30 Z" fill="#b5531d" stroke="#7a3410"/><path d="M8 30 Q30 36 52 30" fill="none" stroke="#f2c230" stroke-width="1.5"/>
+  <path class="diya-flame" d="M30 30 Q22 18 30 4 Q38 18 30 30 Z" fill="#ffb300"/><path d="M30 29 Q26 21 30 13 Q34 21 30 29 Z" fill="#fff3c4"/>
+</svg>`;
+
+// Tairn, a black morningstartail: bat wings, spiked tail club, golden eye.
+const TAIRN_SVG = `<svg viewBox="0 0 230 130" xmlns="http://www.w3.org/2000/svg">
+  <g class="tairn-wing tairn-wing-back"><path d="M100 64 L70 8 L84 30 L98 2 L108 34 L128 10 L126 60 Z" fill="#232323" stroke="#3c3c3c"/></g>
+  <path d="M70 72 Q40 86 22 78 Q10 72 4 80" fill="none" stroke="#141414" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="6" cy="80" r="7" fill="#141414"/>${[0, 60, 120, 180, 240, 300].map((a) => `<path d="M6 80 l${Math.cos((a * Math.PI) / 180) * 11} ${Math.sin((a * Math.PI) / 180) * 11}" stroke="#141414" stroke-width="3"/>`).join("")}
+  <ellipse cx="110" cy="74" rx="46" ry="15" fill="#141414"/>
+  <path d="M150 68 Q170 52 186 52 L210 56 L192 62 Q176 64 160 80 Z" fill="#141414"/>
+  <path d="M190 50 L184 40 L196 50 Z" fill="#3c3c3c"/><circle cx="197" cy="55" r="2.2" fill="#f2c230"/>
+  <path d="M96 86 L92 102 M126 86 L130 102" stroke="#141414" stroke-width="5" stroke-linecap="round"/>
+  <g class="tairn-wing tairn-wing-front"><path d="M106 66 L80 4 L96 28 L112 0 L120 32 L142 8 L136 64 Z" fill="#0d0d0d" stroke="#3c3c3c"/></g>
+</svg>`;
+
+const CELEBRATION_MS = { reduced: 2600, default: 5200 };
 
 function reducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -73,6 +101,24 @@ function hogwartsScene() {
   return `<div class="hp-glow"></div>${candles}${sparkles}
     <div class="hp-hedwig"><div class="hp-bob">${HEDWIG_SVG}</div></div>`;
 }
+
+function templeScene() {
+  const petals = Array.from({ length: 46 }, (_, i) => {
+    const marigold = i % 3 !== 0;
+    return `<span class="petal ${marigold ? "marigold" : "jasmine"}" style="left:${rand(0, 100)}vw;--sway:${rand(-8, 8)}vw;animation-delay:${rand(0, 2.6).toFixed(2)}s;animation-duration:${rand(3, 4.6).toFixed(2)}s"></span>`;
+  }).join("");
+  const diyas = Array.from({ length: 9 }, (_, i) => `<div class="diya" style="animation-delay:${(0.3 + i * 0.22).toFixed(2)}s">${DIYA_SVG}</div>`).join("");
+  return `<div class="temple-glow"></div><div class="kolam">${KOLAM_SVG}</div><div class="diyas">${diyas}</div>${petals}`;
+}
+
+function dragonScene() {
+  const bolts = [[18, 0.35], [72, 1.5], [44, 2.55]].map(([x, delay]) => `<svg class="bolt" style="left:${x}vw;animation-delay:${delay}s" viewBox="0 0 60 300" preserveAspectRatio="none">
+      <polyline points="34,0 22,90 38,96 16,190 32,196 8,300" fill="none" stroke="#fff6c8" stroke-width="5" stroke-linejoin="round"/>
+      <polyline points="34,0 22,90 38,96 16,190 32,196 8,300" fill="none" stroke="#9fd3ff" stroke-width="12" stroke-linejoin="round" opacity=".35"/></svg>`).join("");
+  return `<div class="storm-flash"></div>${bolts}<div class="tairn"><div class="tairn-fire"></div>${TAIRN_SVG}</div>`;
+}
+
+const SCENES = { sw: starWarsScene, hp: hogwartsScene, hindu: templeScene, dragon: dragonScene };
 
 // Hedwig leaves a falling trail of sparkles as she flies.
 function sparkleTrail(layer) {
@@ -110,13 +156,13 @@ function celebrate(titles) {
   const layer = document.createElement("div");
   layer.className = `celebration celebration-${currentTheme}${reduced ? " reduced" : ""}`;
   const label = titles.length === 1 ? titles[0] : `${titles.length} tasks complete`;
-  const scene = reduced ? "" : currentTheme === "sw" ? starWarsScene() : hogwartsScene();
+  const scene = reduced ? "" : (SCENES[currentTheme] || hogwartsScene)();
   layer.innerHTML = `<div class="celebration-scene" aria-hidden="true">${scene}</div>
     <div class="celebration-banner" role="status"><div class="cb-title">${esc(T("celebrateTitle"))}</div><div class="cb-task">${esc(label)}</div></div>`;
   document.body.appendChild(layer);
   if (!reduced && currentTheme === "hp") sparkleTrail(layer);
   if (!reduced && currentTheme === "sw") fireTorpedo(layer);
-  setTimeout(() => layer.remove(), reduced ? CELEBRATION_MS.reduced : CELEBRATION_MS[currentTheme]);
+  setTimeout(() => layer.remove(), reduced ? CELEBRATION_MS.reduced : CELEBRATION_MS.default);
 }
 
 // Compares against the Done tasks this browser saw last time (per signed-in user). The very
