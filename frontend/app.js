@@ -72,12 +72,12 @@ function badge(kind, value) {
 
 // Each task has a helper per theme in `helpers` (hp, sw, hindu, dragon, wof). Older tasks
 // kept the Harry Potter one in `helper`. Hindu deities render as Tanjore medallions, Wings
-// of Fire as chibi dragons, the rest as Labubus.
+// of Fire as chibi dragons, the rest as chibi characters (characterSVG).
 const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS, hindu: HINDU_CHARACTERS, dragon: DRAGON_CHARACTERS, wof: WOF_CHARACTERS };
 const RENDERERS = { hindu: medallionSVG, wof: dragonSVG };
 
 function helperSVG(ch) {
-  return (RENDERERS[currentTheme] || labubuSVG)(ch);
+  return (RENDERERS[currentTheme] || characterSVG)(ch);
 }
 
 function taskHelper(t) {

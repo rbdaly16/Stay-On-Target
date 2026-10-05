@@ -1,7 +1,8 @@
-// Harry Potter Labubus drawn as inline SVG. Each task's `helper.character` in data.js
-// references a key here. Every character shares the Labubu base (bunny ears, round
-// furry head, toothy grin); `back`, `body`, `front`, `eyes`, `face`, and `earInner`
-// customize the look. Star Wars characters live in characters_sw.js.
+// Harry Potter characters, drawn as cute chibi figures in inline SVG. Each task's
+// `helpers.hp.character` references a key here. Every character shares the chibi base
+// (round head with `fur` as hair, big shiny eyes, small smile); `back`, `body`, `ears`,
+// `front`, `eyes`, `mouth`, and `face` customize the look. chibiSVG/characterSVG below
+// are shared by the Star Wars and Empyrean rosters too.
 
 const FACE = "#f7e1cc";
 const eye = (x) => `<ellipse cx="${x}" cy="66" rx="4.3" ry="5.3" fill="#24150f"/><circle cx="${x + 1.5}" cy="64" r="1.5" fill="#fff"/>`;
@@ -118,7 +119,9 @@ const CHARACTERS = {
   griphook: {
     name: "Griphook",
     fur: "#9aa77c",
+    face: "#c9cfa6",
     robe: "#2b2b2b",
+    ears: `<path d="M26 62 L6 50 L24 74 Z M74 62 L94 50 L76 74 Z" fill="#b8c193" stroke="#7d8a5c" stroke-width="1"/>`,
     body: `<path d="M41 100 L50 112 L59 100 Z" fill="#fff"/><path d="M45 102 L50 105 L55 102 L55 108 L50 105 L45 108 Z" fill="#111"/>
        <circle cx="70" cy="113" r="7.5" fill="#d3a625" stroke="#a67c00" stroke-width="1.2"/>
        <text x="70" y="117" text-anchor="middle" font-size="9" font-family="Georgia, serif" font-weight="bold" fill="#8a6500">G</text>`,
@@ -126,24 +129,24 @@ const CHARACTERS = {
   },
 };
 
-function labubuSVG(c) {
-  const fur = c.fur;
-  const ear = c.earInner || "#f2b8c0";
-  return `<svg viewBox="0 0 100 130" class="labubu" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+function chibiSVG(c) {
+  return `<svg viewBox="0 0 100 130" class="helper-art" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     ${c.back || ""}
     <ellipse cx="50" cy="114" rx="23" ry="15" fill="${c.robe}"/>
     ${c.body || ""}
-    <ellipse cx="35" cy="26" rx="8.5" ry="21" fill="${fur}" transform="rotate(-14 35 26)"/>
-    <ellipse cx="35" cy="28" rx="4" ry="13" fill="${ear}" transform="rotate(-14 35 28)"/>
-    <ellipse cx="65" cy="26" rx="8.5" ry="21" fill="${fur}" transform="rotate(14 65 26)"/>
-    <ellipse cx="65" cy="28" rx="4" ry="13" fill="${ear}" transform="rotate(14 65 28)"/>
-    <circle cx="50" cy="64" r="30" fill="${fur}"/>
-    <ellipse cx="50" cy="70" rx="21" ry="17" fill="${c.face || FACE}"/>
-    <circle cx="35" cy="76" r="3.2" fill="#f4a7a7" opacity=".7"/>
-    <circle cx="65" cy="76" r="3.2" fill="#f4a7a7" opacity=".7"/>
+    ${c.ears || ""}
+    <circle cx="50" cy="64" r="30" fill="${c.fur}"/>
+    <ellipse cx="50" cy="69" rx="22" ry="19" fill="${c.face || FACE}"/>
+    <circle cx="35" cy="76" r="3.6" fill="#f4a7a7" opacity=".6"/>
+    <circle cx="65" cy="76" r="3.6" fill="#f4a7a7" opacity=".6"/>
     ${c.eyes ?? EYES}
-    <path d="M38 75 Q50 87 62 75 Z" fill="#5a1414"/>
-    <path d="M38.5 75.3 L40.8 78.6 L43 75.8 L45.3 79.6 L47.6 76 L50 80 L52.4 76 L54.7 79.6 L57 75.8 L59.2 78.6 L61.5 75.3 Z" fill="#fff"/>
+    ${c.mouth ?? `<path d="M45 77 Q50 81.5 55 77" fill="none" stroke="#5a2a2a" stroke-width="1.6" stroke-linecap="round"/>`}
     ${c.front || ""}
   </svg>`;
+}
+
+// Picks the drawing style for a character: chibi dragons (`kind: "dragon"`, drawn by
+// dragonSVG in characters_wof.js) or chibi people and creatures.
+function characterSVG(c) {
+  return c.kind === "dragon" ? dragonSVG(c) : chibiSVG(c);
 }

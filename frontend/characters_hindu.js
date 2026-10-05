@@ -124,7 +124,7 @@ function medallionSVG(c) {
     const y = t < 0.5 ? 50 - Math.sin(t * Math.PI) * 42 : 50 - Math.sin(t * Math.PI) * 42;
     return `<circle cx="${x}" cy="${Math.min(y, 50)}" r="2.3" fill="${i % 2 ? "#c62828" : "#2e7d32"}" stroke="#fff3c4" stroke-width=".6"/>`;
   }).join("");
-  return `<svg viewBox="0 0 100 130" class="labubu medallion" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  return `<svg viewBox="0 0 100 130" class="helper-art medallion" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M10 124 L10 50 Q10 14 50 4 Q90 14 90 50 L90 124 Z" fill="#d4a017" stroke="#8a6a10" stroke-width="1.5"/>
     <path d="M10 124 L10 50 Q10 14 50 4 Q90 14 90 50 L90 124 Z" fill="none" stroke="#fff3c4" stroke-width=".8" transform="translate(50 64) scale(.94) translate(-50 -64)"/>
     <path d="M20 118 L20 52 Q20 24 50 15 Q80 24 80 52 L80 118 Z" fill="${c.bg}"/>

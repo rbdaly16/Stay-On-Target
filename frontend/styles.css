@@ -174,11 +174,11 @@ a.g-label:hover { background: var(--hover); }
 .badge.status-not-started, .badge.status-in-progress, .badge.status-blocked, .badge.status-done { color: #fff; opacity: 1; }
 .badge[class*="category-"] { background: var(--green-light); color: var(--green-dark); }
 
-/* Helpers (Labubus) */
+/* Helpers (chibi characters, dragons, medallions) */
 .helper { display: inline-flex; flex: 0 0 auto; cursor: help; transition: transform 0.15s; }
 .helper:hover { transform: scale(1.12) rotate(-4deg); }
-.helper-sm .labubu { width: 40px; height: 52px; }
-.helper-lg .labubu { width: 120px; height: 156px; }
+.helper-sm .helper-art { width: 40px; height: 52px; }
+.helper-lg .helper-art { width: 120px; height: 156px; }
 .helper-card { display: flex; align-items: center; gap: 22px; background: var(--parchment); border: 1px solid var(--line); border-radius: 8px; padding: 14px 20px; }
 .helper-name { font-size: 20px; font-weight: 800; color: var(--green-dark); margin-bottom: 4px; }
 .helper-card p { margin: 0; font-size: 17px; }
@@ -592,7 +592,7 @@ body.signed-out #last-updated { display: none; }
 :root[data-theme="hindu"] h1, :root[data-theme="hindu"] h2, :root[data-theme="hindu"] .stat-n { font-weight: 400; }
 :root[data-theme="hindu"] .gantt-wrap, :root[data-theme="hindu"] .task, :root[data-theme="hindu"] .stat { border-color: var(--gold); }
 :root[data-theme="hindu"] .g-group .g-label { color: var(--gold); font-weight: 400; }
-:root[data-theme="hindu"] .helper-lg .labubu { width: 110px; height: 143px; }
+:root[data-theme="hindu"] .helper-lg .helper-art { width: 110px; height: 143px; }
 
 /* ---- Empyrean theme: Basgiath stone, ember red and dragon green, gold for dragon eyes ---- */
 :root[data-theme="dragon"] {

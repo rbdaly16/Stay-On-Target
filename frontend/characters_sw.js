@@ -1,4 +1,5 @@
-// Star Wars Labubus, drawn with labubuSVG() and the shared pieces from characters.js.
+// Star Wars characters as cute chibi figures, drawn with chibiSVG() and the shared pieces
+// from characters.js.
 // Each task's `helpers.sw.character` in the data references a key here.
 
 const SABER = (color, x = 82) => `<rect x="${x}" y="103" width="4.5" height="11" rx="1" fill="#9a9a9a"/><rect x="${x}" y="105" width="4.5" height="2" fill="#333"/>
@@ -33,7 +34,6 @@ const SW_CHARACTERS = {
     name: "Chewbacca",
     fur: "#7a5230",
     face: "#a8784a",
-    earInner: "#5e3d22",
     robe: "#6b4626",
     body: `<path d="M30 104 L70 126" stroke="#3d2a16" stroke-width="5"/>
        ${[38, 46, 54, 62].map((x, i) => `<rect x="${x - 2}" y="${106 + i * 4.4}" width="4" height="4" fill="#b8b8b8" transform="rotate(29 ${x} ${108 + i * 4.4})"/>`).join("")}`,
@@ -43,7 +43,7 @@ const SW_CHARACTERS = {
     name: "Yoda",
     fur: "#8fb36a",
     face: "#b9d39a",
-    earInner: "#c9a6a0",
+    ears: `<path d="M24 64 L0 54 Q8 66 26 74 Z M76 64 L100 54 Q92 66 74 74 Z" fill="#8fb36a"/><path d="M22 66 L8 59 Q14 66 24 71 Z M78 66 L92 59 Q86 66 76 71 Z" fill="#c9a6a0" opacity=".7"/>`,
     robe: "#c2a878",
     body: `<path d="M27 104 Q50 96 73 104 L70 126 Q50 130 30 126 Z" fill="#8a6f48" opacity=".55"/><rect x="73" y="98" width="3" height="28" rx="1.5" fill="#6b4f2a"/>`,
     front: `<path d="M40 40 q4 -6 9 -2 M52 38 q5 -5 9 1" fill="none" stroke="#e8e8e8" stroke-width="1.4" stroke-linecap="round"/>`,
@@ -59,7 +59,6 @@ const SW_CHARACTERS = {
     name: "R2-D2",
     fur: "#e8eef5",
     face: "#f5f8fc",
-    earInner: "#2f6fd0",
     robe: "#dfe7f0",
     body: `<rect x="40" y="104" width="8" height="14" rx="1" fill="#2f6fd0"/><rect x="52" y="104" width="8" height="5" rx="1" fill="#2f6fd0"/><rect x="52" y="112" width="8" height="6" rx="1" fill="#9db4cf"/>`,
     front: `<path d="M27 52 Q50 26 73 52 L69 54 Q50 34 31 54 Z" fill="#2f6fd0"/><rect x="44" y="40" width="12" height="5" rx="1" fill="#2f6fd0"/><circle cx="62" cy="45" r="2" fill="#e53935"/>`,
@@ -68,7 +67,6 @@ const SW_CHARACTERS = {
     name: "C-3PO",
     fur: "#d4a72c",
     face: "#e8c75a",
-    earInner: "#a67f12",
     robe: "#c99a22",
     eyes: `<circle cx="42" cy="66" r="5" fill="#ffe066" stroke="#8a6a10" stroke-width="1.5"/><circle cx="58" cy="66" r="5" fill="#ffe066" stroke="#8a6a10" stroke-width="1.5"/>`,
     body: `<path d="M38 104 L62 104 M40 110 L60 110 M44 116 L56 116" stroke="#8a6a10" stroke-width="1.5"/><circle cx="50" cy="121" r="2.5" fill="#8a6a10"/>`,
@@ -84,7 +82,6 @@ const SW_CHARACTERS = {
     name: "Darth Vader",
     fur: "#151515",
     face: "#2c2c2c",
-    earInner: "#3a3a3a",
     robe: "#0d0d0d",
     eyes: `<ellipse cx="42" cy="65" rx="5.5" ry="4.5" fill="#050505" stroke="#555" stroke-width=".8"/><ellipse cx="58" cy="65" rx="5.5" ry="4.5" fill="#050505" stroke="#555" stroke-width=".8"/>`,
     body: `<rect x="42" y="104" width="16" height="10" rx="1.5" fill="#2a2a2a" stroke="#666" stroke-width=".6"/>

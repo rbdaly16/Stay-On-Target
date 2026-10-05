@@ -1,18 +1,11 @@
-// Empyrean (Fourth Wing / Iron Flame / Onyx Storm) Labubus, drawn with labubuSVG() and the
-// shared pieces from characters.js. Riders wear black flight leathers; dragons get horns,
-// wings, and golden eyes. Each task's `helpers.dragon.character` references a key here.
+// Empyrean (Fourth Wing / Iron Flame / Onyx Storm) characters: riders are cute chibi figures
+// (chibiSVG, characters.js) in black flight leathers; the dragons are chibi dragons
+// (`kind: "dragon"`, dragonSVG from characters_wof.js) with golden eyes.
+// Each task's `helpers.dragon.character` references a key here.
 
 const LEATHERS = `<path d="M34 102 L50 118 L66 102" fill="none" stroke="#3a3a3a" stroke-width="2"/>
   <rect x="30" y="111" width="40" height="3" fill="#3a3a3a"/><rect x="47" y="110" width="6" height="5" rx="1" fill="#9a9a9a"/>`;
 const DAGGER = (x) => `<rect x="${x}" y="108" width="3" height="14" rx="1" fill="#cfd8dc"/><rect x="${x - 1.5}" y="106" width="6" height="2.5" fill="#6d4c41"/>`;
-const goldEye = (x) => `<ellipse cx="${x}" cy="66" rx="4.6" ry="5.4" fill="#f2c230"/><ellipse cx="${x}" cy="66" rx="1.3" ry="4.4" fill="#111"/><circle cx="${x + 1.6}" cy="63.6" r="1.1" fill="#fff"/>`;
-const DRAGON_EYES = goldEye(42) + goldEye(58);
-const horns = (color) => `<path d="M33 42 Q26 30 30 20 Q34 32 40 38 Z M67 42 Q74 30 70 20 Q66 32 60 38 Z" fill="${color}"/>`;
-const wings = (color, edge) => `<path d="M30 104 Q8 90 4 70 Q16 78 22 74 Q20 88 32 98 Z" fill="${color}" stroke="${edge}" stroke-width="1"/>
-  <path d="M70 104 Q92 90 96 70 Q84 78 78 74 Q80 88 68 98 Z" fill="${color}" stroke="${edge}" stroke-width="1"/>`;
-const scales = (color) => [[42, 104], [50, 108], [58, 104], [46, 116], [54, 116]]
-  .map(([x, y]) => `<path d="M${x - 4} ${y} Q${x} ${y + 5} ${x + 4} ${y}" fill="none" stroke="${color}" stroke-width="1.2"/>`).join("");
-
 const DRAGON_CHARACTERS = {
   violet: {
     name: "Violet Sorrengail",
@@ -33,36 +26,19 @@ const DRAGON_CHARACTERS = {
   },
   tairn: {
     name: "Tairn",
-    fur: "#1a1a1a",
-    face: "#2e2e2e",
-    earInner: "#3a3a3a",
-    robe: "#1a1a1a",
-    eyes: DRAGON_EYES,
-    back: wings("#141414", "#444"),
-    body: scales("#3d3d3d"),
-    front: horns("#555"),
+    kind: "dragon", body: "#1c1c1c", belly: "#3a3a3a", wing: "#111111", horn: "#8a8a8a", eye: "#f2c230",
+    back: `<circle cx="90" cy="82" r="5" fill="#2a2a2a"/>${[0, 60, 120, 180, 240, 300].map((a) => `<path d="M90 82 l${(Math.cos((a * Math.PI) / 180) * 8).toFixed(1)} ${(Math.sin((a * Math.PI) / 180) * 8).toFixed(1)}" stroke="#2a2a2a" stroke-width="2"/>`).join("")}`,
   },
   sgaeyl: {
     name: "Sgaeyl",
-    fur: "#1f2f5a",
-    face: "#2c3f73",
-    earInner: "#3a4f8a",
-    robe: "#1f2f5a",
-    eyes: DRAGON_EYES,
-    back: wings("#18264a", "#4a63a8"),
-    body: scales("#3a4f8a") + `<path d="M74 118 l8 -4 l-2 6 l6 0 l-6 4" fill="#9fb3e0"/>`,
-    front: horns("#9fb3e0"),
+    kind: "dragon", body: "#1f2f5a", belly: "#3d5490", wing: "#16244a", horn: "#9fb3e0", eye: "#f2c230",
+    front: `<path d="M88 80 l6 -6 l-2 8 l6 0 l-7 4" fill="#9fb3e0"/>`,
   },
   andarna: {
     name: "Andarna",
-    fur: "#d9a91f",
-    face: "#f0cf6a",
-    earInner: "#b8860b",
-    robe: "#d9a91f",
-    eyes: DRAGON_EYES,
-    back: `<path d="M26 104 Q12 94 10 78 Q18 84 24 82 Q20 94 30 100 Z M74 104 Q88 94 90 78 Q82 84 76 82 Q80 94 70 100 Z" fill="#e8c14a" stroke="#b8860b"/>`,
-    body: scales("#b8860b"),
-    front: `<path d="M40 40 q4 -10 10 -14 q-2 8 2 12 q4 -8 10 -8 q-4 6 -2 12" fill="#f5d77a" stroke="#b8860b" stroke-width=".8"/>`,
+    kind: "dragon", body: "#d9a91f", belly: "#f5d77a", wing: "#e8c14a", horn: "#fff3c4", eye: "#f2c230", tailTip: "none",
+    front: `<path d="M86 84 q6 -4 10 -2 q-4 3 -3 7 q-4 -3 -7 -5 Z" fill="#f5d77a" stroke="#b8860b" stroke-width=".8"/>
+      <path d="M40 36 q4 -8 10 -12 q-2 7 2 10 q4 -7 10 -7 q-4 5 -2 10" fill="#f5d77a" stroke="#b8860b" stroke-width=".8"/>`,
   },
   rhiannon: {
     name: "Rhiannon Matthias",

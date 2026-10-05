@@ -1,4 +1,4 @@
-// Wings of Fire theme: cute chibi dragons (not Labubus), drawn by dragonSVG(). Each tribe gets
+// Wings of Fire theme: cute chibi dragons (not Labubus, per the user), drawn by dragonSVG(). Each tribe gets
 // its signature features: SeaWing glow stripes and fins, RainWing ruff and color patches,
 // NightWing silver scales, SandWing tail barb, IceWing spikes, SkyWing flame glow,
 // SilkWing butterfly wings and antennae, HiveWing stripes, LeafWing leaf wings.
@@ -85,7 +85,7 @@ function dragonSVG(c) {
   const tip = c.tailTip === "none" ? "" : `<path d="M88 86 l6 -8 l-1 9 Z" fill="${c.tailTip || c.body}"/>`;
   const eyes = c.eyes ?? [40, 60].map((x) => `<ellipse cx="${x}" cy="58" rx="7" ry="8" fill="#1d1d1d"/><ellipse cx="${x}" cy="59" rx="5" ry="6" fill="${c.eye}"/>
       <circle cx="${x}" cy="59" r="3" fill="#1d1d1d"/><circle cx="${x + 2.2}" cy="55.5" r="2.2" fill="#fff"/><circle cx="${x - 2}" cy="61" r="1" fill="#fff"/>`).join("");
-  return `<svg viewBox="0 0 100 130" class="labubu wof-dragon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  return `<svg viewBox="0 0 100 130" class="helper-art wof-dragon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     ${c.back || ""}
     <path d="M66 108 Q92 112 90 92 Q89 84 84 86" fill="none" stroke="${c.body}" stroke-width="7" stroke-linecap="round"/>${tip}
     ${wings}
