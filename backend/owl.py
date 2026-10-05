@@ -83,6 +83,9 @@ Rules for updates:
 - Only create a new task when the user clearly asks for or describes a new task. Give it one helper per theme,
   the character best suited to it, each with a 1-2 sentence reason (playful, except where noted):
 {helper_rules}
+- Some existing tasks may be missing a helper for a theme (listed under "Tasks missing helpers"). When the user
+  asks to fill in or add helpers, add a "helpers" object to those tasks' updates containing ONLY the missing
+  themes, following the same rules. Never replace a helper that already exists.
 - For planning questions, answer from the tasks: weigh deadlines, priority, overdue items, and tasks with
   no recent notes. Make no changes.
 - Keep replies short and friendly; a light {flavor} flavor is welcome.
@@ -92,11 +95,14 @@ Allowed values: category {categories}; status {statuses}; priority {priorities}.
 Current data:
 {data}
 
+Tasks missing helpers (task id: themes): {missing_helpers}
+
 Respond with ONLY a JSON object of this shape:
 {{
   "reply": "message to the user",
   "updates": [{{"id": "existing-id", "note": "optional note", "status": "...", "priority": "...",
-               "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "title": "...", "category": "..."}}],
+               "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "title": "...", "category": "...",
+               "helpers": {{"<missing theme>": {{"character": "key", "reason": "..."}}}}}}],
   "new_tasks": [{{"title": "...", "category": "...", "status": "...", "priority": "...",
                  "start": "YYYY-MM-DD", "deadline": "YYYY-MM-DD", "note": "optional",
                  "helpers": {{{helpers_example}}}}}]
@@ -118,6 +124,7 @@ def call_model(messages: list[dict], data: dict, theme: str = "hp") -> dict:
         statuses=STATUSES,
         priorities=PRIORITIES,
         data=json.dumps(data, indent=1),
+        missing_helpers=json.dumps({t["id"]: m for t in data.get("tasks", []) if (m := missing_themes(t))}) or "none",
     )
     body = {
         "model": MODEL,
@@ -178,6 +185,18 @@ def slugify(title: str, taken: set) -> str:
     return slug
 
 
+def task_helpers(task: dict) -> dict:
+    """The task's helpers by theme (older tasks kept the Harry Potter one in `helper`)."""
+    helpers = dict(task.get("helpers") or {})
+    if "hp" not in helpers and isinstance(task.get("helper"), dict):
+        helpers["hp"] = task["helper"]
+    return helpers
+
+
+def missing_themes(task: dict) -> list[str]:
+    return [t for t in ROSTERS if t not in task_helpers(task)]
+
+
 def clean_helpers(raw) -> dict:
     """One valid helper per theme, falling back to a default character."""
     raw = raw if isinstance(raw, dict) else {}
@@ -207,6 +226,16 @@ def apply_changes(data: dict, plan: dict) -> list[str]:
         if isinstance(upd.get("note"), str) and upd["note"].strip():
             task.setdefault("notes", []).append({"date": today, "text": upd["note"].strip()})
             changes.append(f"{task['title']}: added note")
+        # Fill in helpers only for themes the task doesn't have yet; never overwrite.
+        proposed = upd.get("helpers") if isinstance(upd.get("helpers"), dict) else {}
+        for theme in missing_themes(task):
+            h = proposed.get(theme)
+            if isinstance(h, dict) and h.get("character") in ROSTERS[theme] and str(h.get("reason") or "").strip():
+                helpers = task_helpers(task)
+                helpers[theme] = {"character": h["character"], "reason": str(h["reason"]).strip()}
+                task["helpers"] = helpers
+                task.pop("helper", None)
+                changes.append(f"{task['title']}: added {theme} helper")
 
     for new in plan.get("new_tasks") or []:
         fields = clean_fields(new)
