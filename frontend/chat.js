@@ -47,14 +47,14 @@ async function send() {
   sendBtn.disabled = true;
 
   try {
-    const res = await fetch("/api/chat", {
+    const res = await apiFetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ theme: currentTheme, messages: chatHistory.map(({ role, content }) => ({ role, content })) }),
     });
     const out = await res.json();
     pending.remove();
-    if (res.status === 401) return (location.href = "/login");
+    if (res.status === 401) return;
     if (!res.ok) throw new Error(out.error || "Request failed");
     chatHistory.push({ role: "assistant", content: out.reply, changes: out.changes });
     addBubble("assistant", out.reply, out.changes);

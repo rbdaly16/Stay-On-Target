@@ -119,12 +119,13 @@ function celebrate(titles) {
   setTimeout(() => layer.remove(), reduced ? CELEBRATION_MS.reduced : CELEBRATION_MS[currentTheme]);
 }
 
-// Compares against the Done tasks this browser saw last time. The very first visit just
-// records them, so existing completed tasks don't all celebrate at once.
+// Compares against the Done tasks this browser saw last time (per signed-in user). The very
+// first visit just records them, so existing completed tasks don't all celebrate at once.
 function celebrateNewlyDone(list) {
   const done = list.filter((t) => t.status === "Done");
-  const stored = localStorage.getItem("seenDone");
-  localStorage.setItem("seenDone", JSON.stringify(done.map((t) => t.id)));
+  const key = `seenDone:${currentUserId}`;
+  const stored = localStorage.getItem(key);
+  localStorage.setItem(key, JSON.stringify(done.map((t) => t.id)));
   if (stored === null) return;
   const seen = new Set(JSON.parse(stored));
   const fresh = done.filter((t) => !seen.has(t.id));

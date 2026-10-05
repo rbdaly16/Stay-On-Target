@@ -17,9 +17,7 @@ services:
         value: America/New_York
       - key: DATABASE_URL  # Neon connection string
         sync: false
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: APP_PASSWORD
-        sync: false
+      - key: CLERK_PUBLISHABLE_KEY  # public by design (it ships to the browser)
+        value: pk_test_dHJ1c3R5LXN3aW5lLTg3NDcuY2xlcmsuYWNjb3VudHMuZGV2JA
       - key: PORTKEY_API_KEY
         sync: false

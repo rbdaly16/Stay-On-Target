@@ -1,46 +1,47 @@
-"""Copy tasks between the local data.js and the live Postgres database.
+"""Copy a user's tracker between the live database and the local data.js.
 
-  python manage.py push   # local data.js  -> live database (overwrites live data)
-  python manage.py pull   # live database  -> local data.js (overwrites local file)
+  python manage.py pull  [--email E]   # live tracker -> local data.js (overwrites local file)
+  python manage.py push  [--email E]   # local data.js -> live tracker (overwrites live data)
+  python manage.py claim --email E     # move the pre-accounts tracker into E's account
 
-Needs the Neon connection string: DATABASE_URL in the shell, or NEON_STAY_ON_TARGET_DATABASE_URL
-(or DATABASE_URL) in gannt_chart/.env or a parent folder's .env.
+--email defaults to OWNER_EMAIL. Needs the Neon connection string (DATABASE_URL in the
+shell, or NEON_STAY_ON_TARGET_DATABASE_URL / DATABASE_URL in a .env) and CLERK_SECRET_KEY
+(to look up the account by email). The user must have signed in to the site once.
 """
 
+import argparse
 import os
 import sys
-from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-ENV_KEYS = ("NEON_STAY_ON_TARGET_DATABASE_URL=", "DATABASE_URL=")
+from backend import config
 
+os.environ.setdefault("DATABASE_URL", config.env("DATABASE_URL", "NEON_STAY_ON_TARGET_DATABASE_URL"))
 
-def find_database_url() -> str:
-    for folder in (HERE, *HERE.parents):
-        env = folder / ".env"
-        if env.exists():
-            for line in env.read_text().splitlines():
-                if line.startswith(ENV_KEYS):
-                    return line.split("=", 1)[1].strip().strip("'\"")
-    return ""
+from backend import auth, storage  # noqa: E402  (storage reads DATABASE_URL at import)
 
+parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("command", choices=["pull", "push", "claim"])
+parser.add_argument("--email", default=config.env("OWNER_EMAIL"))
+args = parser.parse_args()
 
-if not os.environ.get("DATABASE_URL"):
-    os.environ["DATABASE_URL"] = find_database_url()
-
-from backend import storage  # noqa: E402  (reads DATABASE_URL at import)
-
-if not storage.DATABASE_URL or sys.argv[1:] not in (["push"], ["pull"]):
-    sys.exit(__doc__)
+if not storage.DATABASE_URL:
+    sys.exit("No database URL found; see the usage notes above.")
+if not args.email:
+    sys.exit("Pass --email or set OWNER_EMAIL in .env.")
+user_id = auth.user_id_for_email(args.email)
+if not user_id:
+    sys.exit(f"No Clerk account for {args.email}. Sign in to the site with it first.")
 
 storage.init_db()
-if sys.argv[1] == "push":
+if args.command == "claim":
+    print(f"Moved {storage.claim_legacy(user_id)} tasks into {args.email}'s account.")
+elif args.command == "push":
     data = storage.read_file()
-    if input(f"Overwrite the live database with {len(data['tasks'])} local tasks? [y/N] ").lower() != "y":
+    if input(f"Overwrite {args.email}'s live tracker with {len(data['tasks'])} local tasks? [y/N] ").lower() != "y":
         sys.exit("Cancelled.")
-    storage.save(data)
+    storage.save(user_id, data)
     print(f"Pushed {len(data['tasks'])} tasks.")
 else:
-    data = storage.load()
+    data = storage.load(user_id)
     storage.write_file(data)
     print(f"Pulled {len(data['tasks'])} tasks into data.js.")

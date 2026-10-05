@@ -277,8 +277,8 @@ function setTaskData(data, keepScroll = true) {
 }
 
 async function loadTasks() {
-  const res = await fetch("/api/data");
-  if (res.status === 401) return (location.href = "/login");
+  const res = await apiFetch("/api/data");
+  if (res.status === 401) return;
   if (!res.ok) {
     document.getElementById("app").innerHTML = `<p class="empty">Couldn't load tasks (${res.status}). Try refreshing.</p>`;
     return;
@@ -287,5 +287,5 @@ async function loadTasks() {
 }
 
 window.addEventListener("hashchange", () => route());
-document.addEventListener("themechange", () => route(true));
-loadTasks();
+document.addEventListener("themechange", () => tasks.length && route(true));
+initAuth().then((signedIn) => signedIn && loadTasks());

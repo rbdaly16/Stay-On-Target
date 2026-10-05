@@ -14,9 +14,6 @@ const THEMES = {
     chatIntro: "Tell me what you worked on today, or ask what's coming up. I'll update the map for you.",
     chatPending: "The owl is flying…",
     chatError: "The owl couldn't get through",
-    loginTitle: "Password, please",
-    loginSub: "The Fat Lady won't let just anyone in.",
-    loginButton: "Enter",
     celebrateTitle: "Mischief managed!",
   },
   sw: {
@@ -31,9 +28,6 @@ const THEMES = {
     chatIntro: "Report in, pilot. Tell me what you worked on, or ask what's coming up, and I'll update the star map.",
     chatPending: "Transmitting…",
     chatError: "The transmission didn't get through",
-    loginTitle: "Clearance code, please",
-    loginSub: "Only authorized pilots beyond this point.",
-    loginButton: "Engage",
     celebrateTitle: "Mission complete!",
   },
 };
