@@ -70,11 +70,11 @@ function badge(kind, value) {
   return `<span class="badge ${kind}-${slug(value)}">${esc(value)}</span>`;
 }
 
-// Each task has a helper per theme in `helpers` (hp, sw, hindu, dragon). Older tasks kept
-// the Harry Potter one in `helper`. Hindu deities render as Tanjore medallions; the rest
-// as Labubus.
-const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS, hindu: HINDU_CHARACTERS, dragon: DRAGON_CHARACTERS };
-const RENDERERS = { hindu: medallionSVG };
+// Each task has a helper per theme in `helpers` (hp, sw, hindu, dragon, wof). Older tasks
+// kept the Harry Potter one in `helper`. Hindu deities render as Tanjore medallions, Wings
+// of Fire as chibi dragons, the rest as Labubus.
+const ROSTERS = { hp: CHARACTERS, sw: SW_CHARACTERS, hindu: HINDU_CHARACTERS, dragon: DRAGON_CHARACTERS, wof: WOF_CHARACTERS };
+const RENDERERS = { hindu: medallionSVG, wof: dragonSVG };
 
 function helperSVG(ch) {
   return (RENDERERS[currentTheme] || labubuSVG)(ch);

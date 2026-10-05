@@ -3,7 +3,8 @@
 // Star Wars: an X-wing torpedoes the Death Star. Harry Potter: Hedwig delivers a letter
 // under floating candles and sparkles. Hindu: a kolam draws itself while diyas light and
 // marigold and jasmine petals fall. Empyrean: lightning strikes as Tairn flies past
-// breathing fire. All drawn in HTML/SVG; no images.
+// breathing fire. Wings of Fire: the five dragonets of destiny fly past under three full
+// moons (the brightest night). All drawn in HTML/SVG; no images.
 
 const XWING_SVG = `<svg viewBox="0 0 170 84" xmlns="http://www.w3.org/2000/svg">
   <circle cx="16" cy="34" r="7" fill="#ff8a3d" opacity=".55"/><circle cx="16" cy="50" r="7" fill="#ff8a3d" opacity=".55"/>
@@ -118,7 +119,16 @@ function dragonScene() {
   return `<div class="storm-flash"></div>${bolts}<div class="tairn"><div class="tairn-fire"></div>${TAIRN_SVG}</div>`;
 }
 
-const SCENES = { sw: starWarsScene, hp: hogwartsScene, hindu: templeScene, dragon: dragonScene };
+function wingsOfFireScene() {
+  const moons = [0, 1, 2].map((i) => `<div class="wof-moon" style="left:${30 + i * 18}vw;top:${8 + (i % 2) * 5}vh;animation-delay:${(0.2 + i * 0.3).toFixed(1)}s"></div>`).join("");
+  const stars = Array.from({ length: 30 }, () => `<span class="wof-star" style="left:${rand(2, 98)}vw;top:${rand(2, 60)}vh;animation-delay:${rand(0, 2).toFixed(2)}s"></span>`).join("");
+  const flight = ["clay", "tsunami", "glory", "starflight", "sunny"].map((k, i) =>
+    `<div class="wof-flyer" style="top:${28 + Math.abs(i - 2) * 11 + (i < 2 ? -4 : 0)}vh;animation-delay:${(0.4 + Math.abs(i - 2) * 0.5 + (i < 2 ? 0.25 : 0)).toFixed(2)}s">
+      <div class="wof-bob" style="animation-delay:${(i * 0.15).toFixed(2)}s">${dragonSVG(WOF_CHARACTERS[k])}</div></div>`).join("");
+  return `${stars}${moons}${flight}`;
+}
+
+const SCENES = { sw: starWarsScene, hp: hogwartsScene, hindu: templeScene, dragon: dragonScene, wof: wingsOfFireScene };
 
 // Hedwig leaves a falling trail of sparkles as she flies.
 function sparkleTrail(layer) {

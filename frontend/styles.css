@@ -727,3 +727,57 @@ body.signed-out #last-updated { display: none; }
   z-index: 2;
 }
 .no-deadline:hover { border-color: var(--green); color: var(--green); }
+
+/* ---- Wings of Fire theme: Jade Mountain green and SkyWing red, soft and friendly ---- */
+:root[data-theme="wof"] {
+  --green-dark: #1d6b52;
+  --green: #2a8a6a;
+  --green-mid: #3bb08a;
+  --green-light: #d5f0e4;
+  --red-dark: #b03a2e;
+  --red: #e05a3c;
+  --red-light: #fbd9cf;
+  --gold: #f2b84b;
+  --parchment: #eef7f1;
+  --parchment-light: #fbfffc;
+  --ink: #23363a;
+  --ink-soft: #5b7377;
+  --line: #c8e3d6;
+  --stone: #9aa9ab;
+  --font-display: "Fredoka", "Trebuchet MS", sans-serif;
+  --font-body: "Nunito", "Segoe UI", sans-serif;
+  --header-text: #fff7e6;
+  --topbar-mid: #24806a;
+  --hover: #e2f3ea;
+  --weekend: rgba(29, 107, 82, 0.05);
+  --input-bg: #fff;
+}
+:root[data-theme="wof"] body {
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(242, 184, 75, 0.22), transparent 45%),
+    radial-gradient(ellipse at 90% 100%, rgba(224, 90, 60, 0.12), transparent 50%),
+    #eef7f1;
+}
+:root[data-theme="wof"] .brand { font-weight: 700; letter-spacing: 0.5px; }
+:root[data-theme="wof"] .stat, :root[data-theme="wof"] .gantt-wrap, :root[data-theme="wof"] .task, :root[data-theme="wof"] .welcome { border-radius: 14px; }
+:root[data-theme="wof"] .bar { border-radius: 12px; }
+:root[data-theme="wof"] .group-by button.active { border-color: var(--red-dark); }
+
+/* Wings of Fire celebration: the dragonets fly past under three full moons */
+.celebration-wof .celebration-scene { background: rgba(20, 30, 60, 0.55); animation: fade-in-out 5.2s ease forwards; }
+.wof-moon {
+  position: absolute;
+  width: 11vmin;
+  height: 11vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #fffef2, #f4ecc8 60%, #e3d6a4);
+  box-shadow: 0 0 30px 8px rgba(255, 250, 220, 0.45);
+  opacity: 0;
+  animation: moon-rise 1s ease-out forwards;
+}
+@keyframes moon-rise { from { opacity: 0; transform: translateY(20px) scale(0.8); } to { opacity: 1; transform: none; } }
+.wof-star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: 0; animation: twinkle 1.6s ease-in-out infinite; }
+.wof-flyer { position: absolute; left: 0; width: 110px; animation: wof-fly 3.8s linear both; z-index: 3; }
+.wof-flyer svg { width: 100%; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35)); }
+.wof-bob { animation: hedwig-bob 0.7s ease-in-out infinite alternate; }
+@keyframes wof-fly { from { transform: translateX(-20vw) rotate(-6deg); } to { transform: translateX(112vw) rotate(-6deg); } }

@@ -58,6 +58,20 @@ const THEMES = {
     chatError: "The bond went quiet",
     celebrateTitle: "Task conquered!",
   },
+  wof: {
+    name: "Wings of Fire",
+    brand: "🐲 Jade Mountain Task Map",
+    tagline: "Dragonets of destiny, one task at a time",
+    pageTitle: "Jade Mountain Task Map",
+    done: "Prophecies fulfilled",
+    back: "Back to Pyrrhia",
+    helperHeading: "Dragon friend",
+    chatName: "💎 Dreamvisitor",
+    chatIntro: "Hello, dragonet! Tell me what you worked on today, or ask what's coming up, and I'll update the map.",
+    chatPending: "The Dreamvisitor is reaching out…",
+    chatError: "The dream didn't connect",
+    celebrateTitle: "Prophecy fulfilled!",
+  },
 };
 
 let currentTheme = THEMES[localStorage.getItem("theme")] ? localStorage.getItem("theme") : "hp";

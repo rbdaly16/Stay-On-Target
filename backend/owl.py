@@ -34,13 +34,15 @@ ROSTERS = {
     "sw": _roster("characters_sw.js"),
     "hindu": _roster("characters_hindu.js"),
     "dragon": _roster("characters_dragon.js"),
+    "wof": _roster("characters_wof.js"),
 }
-DEFAULT_HELPER = {"hp": "hermione", "sw": "yoda", "hindu": "ganesha", "dragon": "violet"}
+DEFAULT_HELPER = {"hp": "hermione", "sw": "yoda", "hindu": "ganesha", "dragon": "violet", "wof": "clay"}
 THEME_FLAVOR = {
     "hp": "Hogwarts",
     "sw": "Star Wars",
     "hindu": "warm, respectful South Indian (never joke about the deities)",
     "dragon": "Empyrean (Basgiath War College, dragon riders)",
+    "wof": "Wings of Fire (Pyrrhia, Jade Mountain Academy, dragonets)",
 }
 HELPER_GUIDE = {
     "hp": "Harry Potter characters",
@@ -50,6 +52,7 @@ HELPER_GUIDE = {
     "Dhanvantari for health, Hanuman for diligent service). The reason must be reverent and accurate "
     "to Hindu tradition, with no jokes about the deity",
     "dragon": "Empyrean series characters (riders and dragons)",
+    "wof": "Wings of Fire dragons (all three arcs are fair game)",
 }
 
 
